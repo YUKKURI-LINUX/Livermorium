@@ -1,0 +1,11 @@
+[
+  { "name": "org.mozilla.firefox", "description": "ウェブブラウザ（Firefox）", "default": true },
+  { "name": "org.gnome.Calculator", "description": "GNOME電卓", "default": true },
+  { "name": "org.gnome.TextEditor", "description": "GNOMEテキストエディタ（gedit代替）", "default": true },
+  { "name": "org.gnome.Extensions", "description": "GNOME Shell 拡張機能の管理", "default": true },
+
+  { "name": "org.gnome.Nautilus", "description": "ファイルマネージャ（Flatpak版、APT版の代替用）", "default": false },
+  { "name": "org.gnome.Epiphany", "description": "GNOME Web（軽量ブラウザ）", "default": false },
+  { "name": "org.gnome.FileRoller", "description": "ファイルアーカイブ（圧縮・解凍）", "default": false },
+  { "name": "org.libreoffice.LibreOffice", "description": "オフィススイート（LibreOffice）", "default": true }
+]

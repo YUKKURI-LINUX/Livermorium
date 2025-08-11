@@ -1,0 +1,16 @@
+[org/gnome/desktop/interface]
+clock-show-date=true
+clock-show-seconds=false
+gtk-theme='Yaru-dark'
+icon-theme='Yaru'
+cursor-theme='Yaru'
+
+[org/gnome/shell/extensions/dash-to-dock]
+show-apps-at-top=true
+
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-ac-type='nothing'
+
+[org/gnome/desktop/wm/preferences]
+button-layout='appmenu:minimize,maximize,close'
+

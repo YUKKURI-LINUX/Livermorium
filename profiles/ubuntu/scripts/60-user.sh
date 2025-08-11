@@ -1,0 +1,1 @@
+../../../shared_scripts/60-user.sh

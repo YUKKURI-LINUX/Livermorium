@@ -1,0 +1,13 @@
+{
+  "basename": "hogehoge-ubuntu",
+  "locale": "ja_JP.UTF-8",
+  "keyboard": "jp",
+  "timezone": "Asia/Tokyo",
+  "user": {
+    "name": "live",
+    "password": "live",
+    "autologin": true,
+    "disable_root": true,
+    "groups": ["wheel", "network", "video", "sudo"]
+  }
+}
