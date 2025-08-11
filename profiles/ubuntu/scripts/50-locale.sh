@@ -1,0 +1,1 @@
+../../../shared_scripts/50-locale.sh

@@ -1,0 +1,1 @@
+../../../shared_scripts/71-calamares-install.sh
