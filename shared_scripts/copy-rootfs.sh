@@ -15,7 +15,7 @@ else
     exit 1
 fi
 
-ROOTFS_SOURCE="./profiles/$BASENAME/$ROOTFS_SUBDIR"
+ROOTFS_SOURCE="./profiles/$PROFILENAME/$ROOTFS_SUBDIR"
 
 if [ ! -d "$ROOTFS_SOURCE" ]; then
     echo "[$SCRIPT_NAME] $ROOTFS_SOURCE が存在しません。スキップします。"

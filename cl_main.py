@@ -30,12 +30,14 @@ def main():
         "PASSWORD": user_config.get("password", ""),
         "LOCALE": config.get("locale", "ja_JP.UTF-8"),
         "TIMEZONE": config.get("timezone", "Asia/Tokyo"),
+        "KEYBOARD": config.get("keyboard", "jp"),
         "USER_GROUPS": " ".join(user_config.get("groups", [])),
         "AUTOLOGIN": str(user_config.get("autologin", True)).lower(),
         "DISABLE_ROOT": str(user_config.get("disable_root", True)).lower(),
         "PACKAGE_LIST": " ".join(packages_list),
         "FLATPAK_LIST": " ".join(flatpak_list),
-        "BASENAME": config.get("basename", profile_name)
+        "BASENAME": config.get("basename", profile_name),
+        "PROFILENAME": profile_name
     }
 
     # logs ディレクトリ作成 & ログファイル名生成
