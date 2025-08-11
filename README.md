@@ -9,7 +9,7 @@ tool/ubuntu-setup.sh
 ```
 ## 2.実行
 ```
-./cl_main.py ubuntu
+sudo ./cl_main.py ubuntu
 ```
 ## !実行時注意事項!
 ペッケージのインストール時に
