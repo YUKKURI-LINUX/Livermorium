@@ -21,6 +21,7 @@ echo "[$SCRIPT_NAME] filesystem.squashfs を作成中..."
 
 mksquashfs "${CHROOT_DIR}" "${CASPER_DIR}/filesystem.squashfs" \
   -comp xz -b 1M -noappend -no-recovery -wildcards \
+  -processors "$(nproc)" \
   -e boot/* \
   -e proc/* -e sys/* \
   -e dev/* \
