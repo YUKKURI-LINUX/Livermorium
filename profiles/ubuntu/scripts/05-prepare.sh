@@ -4,6 +4,13 @@ set -e
 SCRIPT_NAME="$(basename "$0")"
 echo "[$SCRIPT_NAME] ホスト側の初期準備を開始..."
 
+echo "[$SCRIPT_NAME]: Checking the installation of required tools..."
+
+apt update
+apt install -y debootstrap xorriso grub-pc-bin xorriso mtools squashfs-tools
+
+echo "[$SCRIPT_NAME]: Process finished successfully."
+
 # BASENAMEの確認
 BASENAME="${BASENAME}"
 TARGET_DIR="../work_build/$BASENAME"
