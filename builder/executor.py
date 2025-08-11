@@ -13,7 +13,7 @@ def write_env_file(env, path):
 
 def run_scripts(profile_path, log_file, env):
     original_scripts_dir = os.path.join(profile_path, "scripts")
-    if not os.path.isdir(scripts_dir):
+    if not os.path.isdir(original_scripts_dir):
         log("[ERROR] scripts ディレクトリが見つかりません", log_file)
         return
 
@@ -22,10 +22,13 @@ def run_scripts(profile_path, log_file, env):
     tmp_dir = os.path.join(chroot_dir, "tmp")
     os.makedirs(tmp_dir, exist_ok=True)
 
-    scripts_dir = os.path.join(chroot_dir, "scripts")
+    scripts_dir = os.path.join("../work_build/", "scripts")
+    if os.path.isdir(scripts_dir):
+        shutil.rmtree(scripts_dir)
+
     os.makedirs(scripts_dir, exist_ok=True)
     shutil.copytree(original_scripts_dir, scripts_dir, symlinks=False, dirs_exist_ok=True)
-    shutil.copytree(os.path.join("./shared_scripts/", basename), scripts_dir, symlinks=False, dirs_exist_ok=True)
+    shutil.copytree(os.path.join("./shared_scripts/"), scripts_dir, symlinks=False, dirs_exist_ok=True)
 
     log(f"[DEBUG] tmp_dir: {tmp_dir}", log_file)
     log(f"[DEBUG] env: {env}", log_file)
