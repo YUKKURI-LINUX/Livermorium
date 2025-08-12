@@ -1,0 +1,1 @@
+../../../shared_scripts/00-root.sh
