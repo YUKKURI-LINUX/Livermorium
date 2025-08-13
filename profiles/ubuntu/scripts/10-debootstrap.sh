@@ -7,7 +7,7 @@ echo "[$SCRIPT_NAME] Ubuntu ベースシステム構築を開始..."
 # 環境変数の取得（デフォルト指定あり）
 BASENAME="${BASENAME}"
 SUITE="${SUITE:-noble}"  # Ubuntu 24.04 (Noble Numbat)
-MIRROR="${MIRROR:-http://archive.ubuntu.com/ubuntu}"
+MIRROR="${MIRROR:-http://ubuntutym.u-toyama.ac.jp/ubuntu}"
 ARCH="${ARCH:-amd64}"
 
 TARGET_DIR="../work_build/$BASENAME"
