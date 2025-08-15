@@ -49,7 +49,7 @@ fi
 # 不要なドキュメント・man・info削除
 # ----------------------------------------
 rm -rf "$CHROOT_DIR/usr/share/doc"/*
-rm -rf "$CHROOT_DIR/usr/share/man"/*
+#rm -rf "$CHROOT_DIR/usr/share/man"/*
 rm -rf "$CHROOT_DIR/usr/share/info"/*
 
 # ----------------------------------------

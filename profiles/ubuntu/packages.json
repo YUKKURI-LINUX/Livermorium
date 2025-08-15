@@ -28,6 +28,15 @@
   { "name": "gvfs-backends", "description": "Nautilusのリモートファイルアクセス(SMB/FTP)", "default": true },
   { "name": "gvfs-fuse", "description": "FUSEマウント機能", "default": true },
 
+
+  { "name": "language-pack-ja", "description": "日本語ロケール", "default": true },
+  { "name": "manpages-ja",       "description": "日本語 man ページ", "default": true },
+  { "name": "manpages-ja-dev",   "description": "日本語 man（開発）", "default":true  },
+
+  { "name": "language-pack-gnome-ja", "description": "GNOME 日本語言語パック", "default": true },
+  { "name": "gnome-user-docs-ja", "description": "GNOME ユーザードキュメント（日本語）", "default": true },
+  { "name": "fonts-noto-cjk-extra", "description": "Noto CJK フォント（追加）", "default": true },
+
   { "name": "fonts-noto-cjk", "description": "日本語フォント（Noto CJK）", "default": true },
   { "name": "fonts-noto-color-emoji", "description": "カラー絵文字フォント", "default": true },
   { "name": "fcitx5-mozc", "description": "日本語入力（Fcitx5 + Mozc）", "default": true },
