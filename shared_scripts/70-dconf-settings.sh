@@ -10,7 +10,7 @@ echo "[$SCRIPT_NAME] GNOME dconf 設定を反映中..."
 echo "user-db:user\nsystem-db:local" > /etc/dconf/profile/user
 
 # 設定ファイルがない場合スキップ
-if  [ -f  /etc/dconf/db/local.d ]; then
+if  [ -f  /etc/dconf/db/local.d/* ]; then
 
     # dconf update
     if command -v dconf >/dev/null 2>&1; then

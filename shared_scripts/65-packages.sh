@@ -3,16 +3,17 @@ set -e
 
 echo "[65-packages.sh] パッケージと Flatpak アプリのインストールを開始..."
 
-# === Universe, Multiverse リポジトリの追加（Ubuntu Noble は必要最小構成なので明示的に追加）===
-if ! grep -q "noble universe" /etc/apt/sources.list; then
-    echo "[INFO] universe/multiverse を sources.list に追加します"
-    cat <<EOF >> /etc/apt/sources.list
+source /etc/os-release
 
-deb http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu noble-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu noble-security main restricted universe multiverse
+
+# === Universe, Multiverse リポジトリの追加（Ubuntu Noble は必要最小構成なので明示的に追加）===
+echo "[INFO] universe/multiverse を sources.list に追加します"
+cat <<EOF > /etc/apt/sources.list
+
+deb http://ubuntutym.u-toyama.ac.jp/ubuntu $VERSION_CODENAME main restricted universe multiverse
+deb  http://ubuntutym.u-toyama.ac.jp/ubuntu $VERSION_CODENAME-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu $VERSION_CODENAME-security main restricted universe multiverse
 EOF
-fi
 
 # === パッケージリストの更新 ===
 apt update
