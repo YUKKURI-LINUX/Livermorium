@@ -1,0 +1,66 @@
+{
+  "nodes": {
+    "base": {
+      "desc": "初期準備",
+      "patterns": ["05-*.sh", "10-*.sh", "30-*.sh", "40-*.sh"]
+    },
+    "locale": {
+      "desc": "ロケール/キーボード",
+      "deps": ["base"],
+      "patterns": ["50-locale.sh", "52-keyboard.sh"]
+    },
+    "user": {
+      "desc": "ユーザー・グループ",
+      "deps": ["locale"],
+      "patterns": ["60-user.sh"]
+    },
+    "packages": {
+      "desc": "APT/Flatpak 導入",
+      "deps": ["user"],
+      "patterns": ["65-packages.sh"]
+    },
+    "desktop": {
+      "desc": "デスクトップ設定/Calamares/サービス",
+      "deps": ["packages"],
+      "patterns": ["70-dconf-settings.sh", "71-calamares-install.sh", "75-enable-services.sh", "76-systemd-initramfs.sh"]
+    },
+    "finalize": {
+      "desc": "rootfs コピー後/整備",
+      "deps": ["desktop"],
+      "patterns": ["80-copy-rootfs-after.sh", "81-chown-home.sh", "82-purge-hostside.sh"]
+    },
+    "boot": {
+      "desc": "GRUB と EFI/El Torito",
+      "deps": ["finalize"],
+      "patterns": ["84-create-grubcfg.sh", "85-generate-eltorito.sh", "86-generate-efi.sh"]
+    },
+    "iso": {
+      "desc": "ISO 最終生成",
+      "deps": ["boot"],
+      "patterns": ["90-build-iso.sh"]
+    },
+
+    "minimal": {
+      "desc": "最小構成（基本 + ロケール）",
+      "includes": ["base", "locale"]
+    },
+    "with-packages": {
+      "desc": "パッケージ導入まで",
+      "includes": ["minimal", "user", "packages"]
+    },
+    "full-desktop": {
+      "desc": "フル構成（ISOまで）",
+      "includes": ["with-packages", "desktop", "finalize", "boot", "iso"]
+    }
+  },
+
+  "prelude": {
+    "always_first": ["00-*.sh", "00-*.py"]
+  },
+
+  "finalizers": {
+    "always": ["99-*.sh"],
+    "on_failure": [],
+    "on_success": []
+  }
+}

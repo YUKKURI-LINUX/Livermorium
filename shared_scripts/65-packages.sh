@@ -20,8 +20,9 @@ apt update
 
 # === 通常のパッケージをインストール ===
 if [ -n "$PACKAGE_LIST" ]; then
-    echo "[INFO] 通常パッケージのインストール: $PACKAGE_LIST"
-    apt install -y $PACKAGE_LIST
+    IFS="," read -r -a __PKGS <<< "$PACKAGE_LIST"
+    echo "[INFO] 通常パッケージのインストール: ${__PKGS[*]}"
+    apt install -y "${__PKGS[@]}"
 fi
 
 apt upgrade -y
@@ -47,7 +48,8 @@ fi
 # === Flatpak アプリをインストール ===
 if [ -n "$FLATPAK_LIST" ]; then
     echo "[INFO] Flatpak アプリのインストール: $FLATPAK_LIST"
-    for app in $FLATPAK_LIST; do
+    IFS="," read -r -a __FLATS <<< "$FLATPAK_LIST"
+    for app in "${__FLATS[@]}"; do
         flatpak install -y flathub "$app"
        ##もじばけかいひ 
         #flatpak run --command=fc-cache $app -f -v 
