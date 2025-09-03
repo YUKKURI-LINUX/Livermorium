@@ -11,7 +11,8 @@ echo "[INFO] ユーザー '$USERNAME' を作成中..."
 echo "[INFO] グループ: $USER_GROUPS"
 
 # グループが存在しなければ作成
-for group in $USER_GROUPS; do
+IFS="," read -r -a __GRPS <<< "$USER_GROUPS"
+for group in "${__GRPS[@]}"; do
     if ! getent group "$group" > /dev/null 2>&1; then
         echo "[INFO] グループ '$group' を作成"
         groupadd "$group"
@@ -29,7 +30,8 @@ else
 fi
 
 # グループにユーザーを追加
-for group in $USER_GROUPS; do
+IFS="," read -r -a __GRPS <<< "$USER_GROUPS"
+for group in "${__GRPS[@]}"; do
     usermod -aG "$group" "$USERNAME"
 done
 
