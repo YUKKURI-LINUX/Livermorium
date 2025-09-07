@@ -1,0 +1,29 @@
+/* 全体を白ベースに（混在対策） */
+window, .background, box, stack, stackswitcher,
+scrolledwindow, viewport, list, row {
+  background-color: #ffffff;
+  color: #111111;
+}
+
+/* StackSwitcher の余白を詰める（横幅が広がりすぎないよう） */
+stackswitcher > button {
+  padding-left: 6px;
+  padding-right: 6px;
+  min-width: 1px;
+}
+stackswitcher > button > label {
+  max-width: 110px;
+}
+
+
+/* 最低サイズ（補助。実効はUIの min-content-* を優先） */
+#root {
+  min-width: 840px;
+  min-height: 620px;
+}
+
+/* スクロール領域の主張を控えめに（幅を縮めやすく） */
+.scroller {
+  min-width: 320px;
+  min-height: 320px;
+}
