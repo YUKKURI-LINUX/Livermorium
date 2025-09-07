@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+
+  <!-- ルート -->
+  <object class="GtkBox" id="root">
+    <property name="orientation">vertical</property>
+    <property name="spacing">8</property>
+
+    <!-- ヘッダ -->
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <property name="spacing">6</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">8</property>
+
+        <child>
+          <object class="GtkLabel">
+            <property name="label">プロファイル</property>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkComboBoxText" id="profile_combo">
+            <property name="hexpand">true</property>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkButton" id="refresh_profiles_btn">
+            <property name="label">再読込</property>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkProgressBar" id="progress">
+            <property name="hexpand">true</property>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkButton" id="run_button">
+            <property name="label">実行</property>
+            <style>
+              <class name="suggested-action"/>
+            </style>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <!-- 本体 -->
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-bottom">8</property>
+
+        <!-- タブ切替 -->
+        <child>
+          <object class="GtkStackSwitcher">
+            <property name="stack">stack</property>
+            <property name="halign">fill</property>
+            <property name="hexpand">true</property>
+          </object>
+        </child>
+
+        <!-- スタック -->
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="transition-type">slide-left-right</property>
+            <property name="vexpand">true</property>
+            <property name="vhomogeneous">true</property>
+            <property name="hhomogeneous">true</property>
+
+            <!-- Packages -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_packages</property>
+                <property name="title">pkg</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
+                    <property name="margin-top">6</property>
+
+                    <child>
+                      <object class="GtkLabel" id="packages_empty_label">
+                        <property name="label">packages.json が見つかりません</property>
+                        <property name="visible">false</property>
+                        <property name="xalign">0</property>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="vexpand">true</property>
+                        <property name="min-content-height">320</property>
+                        <property name="min-content-width">320</property>
+                        <property name="child">
+                          <object class="GtkListBox" id="packages_list"/>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- Flatpak -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_flatpak</property>
+                <property name="title">Flatpak</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
+                    <property name="margin-top">6</property>
+
+                    <child>
+                      <object class="GtkLabel" id="flatpak_empty_label">
+                        <property name="label">flatpak.json が見つかりません</property>
+                        <property name="visible">false</property>
+                        <property name="xalign">0</property>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="vexpand">true</property>
+                        <property name="min-content-height">320</property>
+                        <property name="min-content-width">320</property>
+                        <property name="child">
+                          <object class="GtkListBox" id="flatpak_list"/>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- 実行制御 -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_exec</property>
+                <property name="title">実行制御</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
+                    <property name="margin-top">6</property>
+
+                    <child>
+                      <object class="GtkLabel" id="exec_empty_label">
+                        <property name="label">categories.json または scripts/ が見つかりません</property>
+                        <property name="visible">false</property>
+                        <property name="xalign">0</property>
+                      </object>
+                    </child>
+
+                    <!-- カテゴリ側：全解除ボタン -->
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="GtkButton" id="exec_clear_all_btn">
+                            <property name="label">全解除</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="hexpand">true</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkPaned">
+                        <property name="orientation">horizontal</property>
+                        <property name="wide-handle">true</property>
+                        <property name="shrink-start-child">true</property>
+                        <property name="shrink-end-child">true</property>
+
+                        <!-- 左：Categories -->
+                        <property name="start-child">
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">4</property>
+
+                            <child>
+                              <object class="GtkSearchEntry" id="exec_cat_search">
+                                <property name="placeholder-text">カテゴリを検索</property>
+                              </object>
+                            </child>
+
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="vexpand">true</property>
+                                <property name="min-content-height">320</property>
+                                <property name="min-content-width">320</property>
+                                <property name="child">
+                                  <object class="GtkListBox" id="exec_categories_list"/>
+                                </property>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+
+                        <!-- 右：Files -->
+                        <property name="end-child">
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">4</property>
+
+                            <child>
+                              <object class="GtkBox">
+                                <property name="orientation">horizontal</property>
+                                <property name="spacing">6</property>
+
+                                <child>
+                                  <object class="GtkButton" id="exec_files_select_all_btn">
+                                    <property name="label">全選択</property>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="exec_files_clear_all_btn">
+                                    <property name="label">全解除</property>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="exec_files_toggle_btn">
+                                    <property name="label">反転</property>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="hexpand">true</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+
+                            <child>
+                              <object class="GtkSearchEntry" id="exec_files_search">
+                                <property name="placeholder-text">ファイルを検索</property>
+                              </object>
+                            </child>
+
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="vexpand">true</property>
+                                <property name="min-content-height">320</property>
+                                <property name="min-content-width">320</property>
+                                <property name="child">
+                                  <object class="GtkListBox" id="exec_files_list"/>
+                                </property>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- 実行設定（min/max） -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_exec_conf</property>
+                <property name="title">chroot</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">10</property>
+                    <property name="margin-top">10</property>
+
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">chroot 最小番号 (min)</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="exec_spin_min">
+                            <property name="adjustment">
+                              <object class="GtkAdjustment">
+                                <property name="lower">0</property>
+                                <property name="upper">9999</property>
+                                <property name="step-increment">1</property>
+                              </object>
+                            </property>
+                            <property name="numeric">true</property>
+                            <property name="width-chars">6</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">chroot 最大番号 (max)</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="exec_spin_max">
+                            <property name="adjustment">
+                              <object class="GtkAdjustment">
+                                <property name="lower">0</property>
+                                <property name="upper">9999</property>
+                                <property name="step-increment">1</property>
+                              </object>
+                            </property>
+                            <property name="numeric">true</property>
+                            <property name="width-chars">6</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- Options -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_options</property>
+                <property name="title">オプション</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">10</property>
+                    <property name="margin-top">10</property>
+
+                    <!-- dry-run -->
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">ドライラン (--dry-run)</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="spacing">8</property>
+                            <child>
+                              <object class="GtkCheckButton" id="opt_dry_on">
+                                <property name="label">有効</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkCheckButton" id="opt_dry_off">
+                                <property name="label">無効</property>
+                                <property name="group">opt_dry_on</property>
+                                <property name="active">true</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- keep-going -->
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">途中エラーでも継続 (--keep-going)</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="spacing">8</property>
+                            <child>
+                              <object class="GtkCheckButton" id="opt_keep_on">
+                                <property name="label">有効</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkCheckButton" id="opt_keep_off">
+                                <property name="label">無効</property>
+                                <property name="group">opt_keep_on</property>
+                                <property name="active">true</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- allow-deprecated (ALL) -->
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">deprecated 全許可 (--allow-deprecated)</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="spacing">8</property>
+                            <child>
+                              <object class="GtkCheckButton" id="opt_depr_all_on">
+                                <property name="label">有効</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkCheckButton" id="opt_depr_all_off">
+                                <property name="label">無効</property>
+                                <property name="group">opt_depr_all_on</property>
+                                <property name="active">true</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- allow-deprecated-nodes (CSV) -->
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">6</property>
+
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label">deprecated 個別許可 (--allow-deprecated-nodes)</property>
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="orientation">horizontal</property>
+                                <property name="spacing">8</property>
+                                <child>
+                                  <object class="GtkCheckButton" id="opt_depr_nodes_on">
+                                    <property name="label">有効</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="opt_depr_nodes_off">
+                                    <property name="label">無効</property>
+                                    <property name="group">opt_depr_nodes_on</property>
+                                    <property name="active">true</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="GtkEntry" id="opt_depr_nodes_entry">
+                            <property name="placeholder-text">例: old-base,net-legacy,gui-v1</property>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- Categories 読取専用 -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_categories</property>
+                <property name="title">カテゴリー</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
+                    <property name="margin-top">6</property>
+
+                    <child>
+                      <object class="GtkLabel" id="categories_empty_label">
+                        <property name="label">categories.json のノードが見つかりません</property>
+                        <property name="visible">false</property>
+                        <property name="xalign">0</property>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="vexpand">true</property>
+                        <property name="min-content-height">320</property>
+                        <property name="min-content-width">320</property>
+                        <property name="child">
+                          <object class="GtkListBox" id="categories_list"/>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- Config 読取専用 -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_config</property>
+                <property name="title">Config</property>
+                <property name="child">
+                  <object class="GtkScrolledWindow">
+                    <property name="vexpand">true</property>
+                    <property name="min-content-height">320</property>
+                    <property name="min-content-width">320</property>
+                    <property name="child">
+                      <object class="GtkTextView" id="config_textview">
+                        <property name="editable">false</property>
+                        <property name="monospace">true</property>
+                        <property name="wrap-mode">word-char</property>
+                        <property name="vexpand">true</property>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- 初期実行 -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_prelude</property>
+                <property name="title">初期実行</property>
+                <property name="child">
+                  <object class="GtkScrolledWindow">
+                    <property name="vexpand">true</property>
+                    <property name="min-content-height">320</property>
+                    <property name="min-content-width">320</property>
+                    <property name="child">
+                      <object class="GtkListBox" id="prelude_list"/>
+                    </property>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- 最終実行 -->
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">page_finalizers</property>
+                <property name="title">最終実行</property>
+                <property name="child">
+                  <object class="GtkScrolledWindow">
+                    <property name="vexpand">true</property>
+                    <property name="min-content-height">320</property>
+                    <property name="min-content-width">320</property>
+                    <property name="child">
+                      <object class="GtkListBox" id="finalizers_list"/>
+                    </property>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- Logs page -->
+            <child>
+        <object class="GtkStackPage">
+          <property name="name">page_logs</property>
+          <property name="title">Logs</property>
+          <property name="child">
+            <object class="GtkScrolledWindow" id="log_scroller">
+              <property name="vexpand">true</property>
+              <property name="min-content-height">320</property>
+              <property name="min-content-width">320</property>
+              <property name="child">
+                <!-- ★ ListView → TextView に置換 -->
+                <object class="GtkTextView" id="log_textview">
+                  <property name="editable">false</property>
+                  <property name="monospace">true</property>
+                  <property name="wrap-mode">char</property>
+                  <property name="cursor-visible">false</property>
+                  <property name="hexpand">true</property>
+                  <property name="vexpand">true</property>
+                  <property name="accepts-tab">false</property>
+                  <property name="overwrite">false</property>
+                </object>
+              </property>
+            </object>
+          </property>
+        </object>
+            </child>
+
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
