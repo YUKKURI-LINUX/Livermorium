@@ -7,7 +7,7 @@ echo "[$SCRIPT_NAME] 必要な systemd サービスを有効化します"
 #ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
 # ディスプレイマネージャの自動有効化
-ln -sf /lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service
+#ln -sf /lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service
 
 #if command -v lightdm &>/dev/null; then
 #    echo "[$SCRIPT_NAME] lightdm を有効化します"

@@ -19,8 +19,8 @@
 
   { "name": "ubuntu-desktop", "description": "GNOMEの完全なUbuntuデスクトップ環境", "default": true },
 
-  { "name": "lightdm", "description": "軽量ディスプレイマネージャ", "default": true },
-  { "name": "lightdm-gtk-greeter", "description": "GTKベースのLightDMログイン画面", "default": true },
+  { "name": "lightdm", "description": "軽量ディスプレイマネージャ", "default": false },
+  { "name": "lightdm-gtk-greeter", "description": "GTKベースのLightDMログイン画面", "default": false },
 
   { "name": "network-manager", "description": "ネットワーク管理", "default": true },
   { "name": "policykit-1", "description": "権限昇格ツール", "default": true },
