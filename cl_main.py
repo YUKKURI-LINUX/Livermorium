@@ -56,7 +56,9 @@ def _build_run_list(profile_dir: Path, args) -> List[str]:
     categories_json = profile_dir / "categories.json"
     if not scripts_dir.is_dir():
         raise FileNotFoundError(f"scripts not found: {scripts_dir}")
-    run_tokens = [args.run] if args.run else []
+    #run_tokens = [args.run] if args.run else []
+    run_tokens = _comma_norm(args.run).split(",") if args.run else []
+
     allow_nodes: Set[str] = {s for s in _comma_norm(args.allow_deprecated_nodes).split(",") if s}
     if categories_json.exists():
         cats = Categories.load(categories_json)
