@@ -3,7 +3,6 @@ set -euo pipefail
 
 SCRIPT_NAME="$(basename "$0")"
 
-WORK_DIR="${WORK_DIR:-../work_build}"
 : "${BASENAME:?BASENAME が未定義です}"   # 必須
 ISO_DIR="${WORK_DIR}/iso/${BASENAME}"
 GRUB_DIR="${ISO_DIR}/boot/grub"

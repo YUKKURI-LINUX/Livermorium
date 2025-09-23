@@ -13,9 +13,9 @@ echo "[$SCRIPT_NAME]: Process finished successfully."
 
 # BASENAMEの確認
 BASENAME="${BASENAME}"
-TARGET_DIR="../work_build/$BASENAME"
+TARGET_DIR="$WORK_DIR/$BASENAME"
 
-ISO_DIR="../work_build/iso/${BASENAME}"
+ISO_DIR="$WORK_DIR/iso/${BASENAME}"
 
 # 既存ディレクトリがあれば削除
 if [ -d "$TARGET_DIR" ]; then

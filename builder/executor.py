@@ -3,6 +3,7 @@ from __future__ import annotations
 import os, fnmatch, subprocess, shutil
 from typing import Dict, Iterable, List, Optional
 from builder.logger import log
+from pathlib import Path
 
 def _num_key(name: str):
     return (name[:2], name)
@@ -54,14 +55,20 @@ def run_scripts(
         ch_min, ch_max = 50, 79
 
     basename = env.get("BASENAME","livermorium")
-    chroot_dir = os.path.join("..","work_build", basename)
+    #chroot_dir = os.path.join("..","work_build", basename)
+    chroot_dir = os.path.join(Path(env["WORK_DIR"]), basename)
     tmp_dir = os.path.join(chroot_dir, "tmp"); os.makedirs(tmp_dir, exist_ok=True)
 
     # 作業用 scripts をコピー（元を汚さない）
-    work_scripts_dir = os.path.join("..","work_build","scripts")
+    #work_scripts_dir = os.path.join("..","work_build","scripts")
+    work_scripts_dir = os.path.join(Path(env["WORK_DIR"]),"scripts")
     if os.path.isdir(work_scripts_dir): shutil.rmtree(work_scripts_dir)
     os.makedirs(work_scripts_dir, exist_ok=True)
     shutil.copytree(original_scripts_dir, work_scripts_dir, symlinks=False, dirs_exist_ok=True)
+
+    log(f"[DEBUG] : chroot_dir:{chroot_dir}", log_file)
+    log(f"[DEBUG] : tmp_dir:{tmp_dir}", log_file)
+    log(f"[DEBUG] : work_scripts_dir:{work_scripts_dir}", log_file)
 
     # 本編ターゲット（RUN_LIST or 全部）→番号順
     run_list_csv = env.get("RUN_LIST","")

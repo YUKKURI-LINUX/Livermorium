@@ -139,7 +139,17 @@ def main(argv=None):
               "on_success=", finalizers.get("on_success", []))
         if args.validate or args.list_only: return 0
 
+    repo_root = Path(__file__).resolve().parent
+    parent_of_repo = repo_root.parent
+
+    # 既定: <repo>/../work_build   ← 兄弟ディレクトリ
+    default_work_dir = (parent_of_repo / "work_build").resolve()
+    work_dir = str(default_work_dir)
+    os.makedirs(work_dir, exist_ok=True)
+
     env = {
+        "WORK_DIR": work_dir,
+        "PROFILE_DIR": profile_dir,
         "USERNAME": user.get("name",""),
         "PASSWORD": user.get("password",""),
         "LOCALE":   config.get("locale","ja_JP.UTF-8"),
@@ -161,7 +171,7 @@ def main(argv=None):
     }
     if run_list: env["RUN_LIST"] = ",".join(run_list)
 
-    logs_dir = root / ".." / "work_build" / "logs"; logs_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir =  Path(env['WORK_DIR']) /  "logs"; logs_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
     log_file = str(logs_dir / f"{args.profile}_{env['BASENAME']}_{ts}.log")
     logger.log(f"[INFO] RUN_LIST={env.get('RUN_LIST','')}", log_file)

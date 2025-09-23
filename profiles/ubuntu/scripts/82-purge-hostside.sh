@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_NAME="$(basename "$0")"
-CHROOT_DIR="../work_build/$BASENAME"  
+CHROOT_DIR="${WORK_DIR}/$BASENAME"  
 
 echo "[$SCRIPT_NAME] chroot外での不要ファイル削除を開始（対象: $CHROOT_DIR）"
 
