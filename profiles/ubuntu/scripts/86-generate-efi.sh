@@ -4,7 +4,6 @@ set -e
 SCRIPT_NAME="$(basename "$0")"
 
 
-WORK_DIR="../work_build"
 ISO_DIR="${WORK_DIR}/iso/${BASENAME}"
 GRUB_DIR="${ISO_DIR}/boot/grub"
 EFI_DIR="${ISO_DIR}/EFI/boot"

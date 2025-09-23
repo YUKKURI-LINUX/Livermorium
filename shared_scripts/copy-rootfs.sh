@@ -4,7 +4,7 @@ set -e
 SCRIPT_NAME="$(basename "$0")"
 echo "[$SCRIPT_NAME] rootfs のコピー処理を開始..."
 
-TARGET_DIR="../work_build/$BASENAME"
+TARGET_DIR="${WORK_DIR}/$BASENAME"
 
 if [[ "$SCRIPT_NAME" == *before* ]]; then
     ROOTFS_SUBDIR="rootfs_before"
@@ -15,7 +15,7 @@ else
     exit 1
 fi
 
-ROOTFS_SOURCE="./profiles/$PROFILENAME/$ROOTFS_SUBDIR"
+ROOTFS_SOURCE="$PROFILE_DIR/$ROOTFS_SUBDIR"
 
 if [ ! -d "$ROOTFS_SOURCE" ]; then
     echo "[$SCRIPT_NAME] $ROOTFS_SOURCE が存在しません。スキップします。"

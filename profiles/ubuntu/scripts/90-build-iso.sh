@@ -3,7 +3,6 @@ set -e
 SCRIPT_NAME="$(basename "$0")"
 
 
-WORK_DIR="../work_build"
 CHROOT_DIR="${WORK_DIR}/${BASENAME}"
 ISO_DIR="${WORK_DIR}/iso/${BASENAME}"
 CASPER_DIR="${ISO_DIR}/casper"

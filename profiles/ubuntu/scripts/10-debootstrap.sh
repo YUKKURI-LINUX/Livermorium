@@ -10,7 +10,7 @@ SUITE="${SUITE:-noble}"  # Ubuntu 24.04 (Noble Numbat)
 MIRROR="${MIRROR:-http://ubuntutym.u-toyama.ac.jp/ubuntu}"
 ARCH="${ARCH:-amd64}"
 
-TARGET_DIR="../work_build/$BASENAME"
+TARGET_DIR="${WORK_DIR}/$BASENAME"
 
 # 実行ログ
 echo "[$SCRIPT_NAME] SUITE: $SUITE"

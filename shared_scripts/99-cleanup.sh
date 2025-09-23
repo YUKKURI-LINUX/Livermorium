@@ -5,7 +5,7 @@ SCRIPT_NAME="$(basename "$0")"
 echo "[$SCRIPT_NAME] chroot 環境のアンマウントとクリーンアップを開始..."
 
 BASENAME="${BASENAME:=hogehoge-ubuntu}"
-CHROOT_DIR="../work_build/$BASENAME"
+CHROOT_DIR="$WORK_DIR/$BASENAME"
 
 # アンマウント対象
 MOUNT_POINTS=(
