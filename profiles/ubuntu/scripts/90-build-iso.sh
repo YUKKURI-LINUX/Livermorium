@@ -7,7 +7,7 @@ CHROOT_DIR="${WORK_DIR}/${BASENAME}"
 ISO_DIR="${WORK_DIR}/iso/${BASENAME}"
 CASPER_DIR="${ISO_DIR}/casper"
 GRUB_DIR="${ISO_DIR}/boot/grub"
-EFI_DIR="${ISO_DIR}/EFI/boot"
+EFI_DIR="${ISO_DIR}/EFI/BOOT"
 I386_DIR="${GRUB_DIR}/i386-pc"
 OUT_DIR="${WORK_DIR}/iso_out"
 
@@ -40,7 +40,7 @@ cp -f "${INITRD}"  "${CASPER_DIR}/initrd"
 
 [ -f "${GRUB_DIR}/grub.cfg" ] || { echo "[$SCRIPT_NAME] grub.cfg がありません（84未実行）"; exit 1; }
 [ -f "${I386_DIR}/eltorito.img" ] || { echo "[$SCRIPT_NAME] eltorito.img がありません（85未実行）"; exit 1; }
-[ -f "${EFI_DIR}/bootx64.efi" ] || { echo "[$SCRIPT_NAME] bootx64.efi がありません（86未実行）"; exit 1; }
+[ -f "${EFI_DIR}/BOOTX64.EFI" ] || { echo "[$SCRIPT_NAME] BOOTX64.EFI がありません（86未実行）"; exit 1; }
 
 echo "[$SCRIPT_NAME] md5sum.txt を生成中..."
 (
@@ -59,7 +59,7 @@ xorriso -as mkisofs \
     -no-emul-boot -boot-load-size 4 -boot-info-table \
     -eltorito-catalog boot/grub/boot.cat \
   -eltorito-alt-boot \
-    -e EFI/boot/bootx64.efi \
+    -e EFI/BOOT/efiboot.img \
     -no-emul-boot \
   -isohybrid-gpt-basdat \
   -output "${OUT_ISO}" \
