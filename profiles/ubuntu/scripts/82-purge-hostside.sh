@@ -4,59 +4,62 @@ set -e
 SCRIPT_NAME="$(basename "$0")"
 CHROOT_DIR="${WORK_DIR}/$BASENAME"  
 
-echo "[$SCRIPT_NAME] chroot外での不要ファイル削除を開始（対象: $CHROOT_DIR）"
+echo "[$SCRIPT_NAME] Starting unnecessary file cleanup from outside chroot (Target: $CHROOT_DIR)"
 
 # ----------------------------------------
-# APT関連キャッシュ・リスト削除
+# Delete APT related cache and lists
 # ----------------------------------------
 rm -rf "$CHROOT_DIR/var/cache/apt/archives"/*
 rm -rf "$CHROOT_DIR/var/lib/apt/lists"/*
 
 # ----------------------------------------
-# 一時ファイル削除
+# Delete temporary files
 # ----------------------------------------
 rm -rf "$CHROOT_DIR/tmp"/*
 rm -rf "$CHROOT_DIR/var/tmp"/*
 
 # ----------------------------------------
-# Flatpakキャッシュ削除（fontconfig を除外）
+# Delete Flatpak cache (excluding fontconfig)
 # ----------------------------------------
+# Cleanup for regular users' Flatpak cache
 for user_dir in "$CHROOT_DIR/home/"*; do
     app_cache_base="$user_dir/.var/app"
     if [[ -d "$app_cache_base" ]]; then
         for app_dir in "$app_cache_base"/*; do
             cache_dir="$app_dir/cache"
             if [[ -d "$cache_dir" ]]; then
+                # Find all files/directories in cache_dir, excluding 'fontconfig', and delete them
                 find "$cache_dir" -mindepth 1 -maxdepth 1 ! -name "fontconfig" -exec rm -rf {} +
-                echo "  → 削除: $cache_dir の fontconfig 以外"
+                echo "  → Deleted: everything except fontconfig in $cache_dir"
             fi
         done
     fi
 done
 
-# rootユーザーの Flatpakキャッシュ削除
+# Cleanup for root user's Flatpak cache
 if [[ -d "$CHROOT_DIR/root/.var/app" ]]; then
     for app_dir in "$CHROOT_DIR/root/.var/app"/*; do
         cache_dir="$app_dir/cache"
         if [[ -d "$cache_dir" ]]; then
+            # Find all files/directories in cache_dir, excluding 'fontconfig', and delete them
             find "$cache_dir" -mindepth 1 -maxdepth 1 ! -name "fontconfig" -exec rm -rf {} +
-            echo "  → 削除: $cache_dir の fontconfig 以外"
+            echo "  → Deleted: everything except fontconfig in $cache_dir"
         fi
     done
 fi
 
 # ----------------------------------------
-# 不要なドキュメント・man・info削除
+# Delete unnecessary documents, man pages, and info files
 # ----------------------------------------
 rm -rf "$CHROOT_DIR/usr/share/doc"/*
 #rm -rf "$CHROOT_DIR/usr/share/man"/*
 rm -rf "$CHROOT_DIR/usr/share/info"/*
 
 # ----------------------------------------
-# ログファイル削除と最低限の再作成
+# Delete log files and recreate the minimum necessary
 # ----------------------------------------
 rm -rf "$CHROOT_DIR/var/log"/*
 mkdir -p "$CHROOT_DIR/var/log"
 touch "$CHROOT_DIR/var/log/dpkg.log"
 
-echo "[$SCRIPT_NAME] ホスト側からのクリーンアップ完了"
+echo "[$SCRIPT_NAME] Host-side cleanup complete"

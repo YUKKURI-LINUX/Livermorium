@@ -4,12 +4,14 @@ set -e
 source /tmp/env.sh
 
 SCRIPT_NAME="$(basename "$0")"
-echo "[$SCRIPT_NAME] Calamares をインストール中..."
+echo "[$SCRIPT_NAME] Installing Calamares..."
 
+# Check /etc/os-release for distribution ID
 if [ -f /etc/os-release ]; then
     source /etc/os-release
 fi
 
+# Install Calamares based on the distribution ID
 if [[ "$ID" == "arch" || "$ID_LIKE" == *"arch"* ]]; then
     pacman -Sy --noconfirm calamares
 elif [[ "$ID" == "ubuntu" || "$ID_LIKE" == *"ubuntu"* || "$ID_LIKE" == *"debian"* ]]; then
@@ -20,8 +22,8 @@ elif [[ "$ID" == "fedora" || "$ID_LIKE" == *"fedora"* ]]; then
 elif [[ "$ID" == "opensuse-tumbleweed" || "$ID_LIKE" == *"suse"* ]]; then
     zypper install -y calamares
 else
-    echo "[$SCRIPT_NAME] Calamares のインストールに対応していないディストリです"
+    echo "[$SCRIPT_NAME] Distribution not supported for Calamares installation"
     exit 1
 fi
 
-echo "[$SCRIPT_NAME] Calamares インストール完了"
+echo "[$SCRIPT_NAME] Calamares installation complete"

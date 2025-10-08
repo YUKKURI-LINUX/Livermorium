@@ -8,41 +8,47 @@ GRUB_DIR="${ISO_DIR}/boot/grub"
 EFI_DIR="${ISO_DIR}/EFI/BOOT"
 GRUB_CFG="${GRUB_DIR}/grub.cfg"
 
+# Install required signed packages
 apt install -y shim-signed grub-efi-amd64-signed
 
-[ -f "${GRUB_CFG}" ] || { echo "[$SCRIPT_NAME] ${GRUB_CFG} がありません（84を先に実行）"; exit 1; }
+# Check for prerequisite file (grub.cfg)
+[ -f "${GRUB_CFG}" ] || { echo "[$SCRIPT_NAME] ${GRUB_CFG} is missing (run 84 first)"; exit 1; }
+# Create EFI directory structure
 mkdir -p "${EFI_DIR}"
 
-# --- 1) shim + signed grub を配置 ---
+# --- 1) Place shim and signed grub ---
 SHIM="/usr/lib/shim/shimx64.efi.signed"
 GRUB_SIGNED="/usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed"
 
+# Check if the required signed files exist
 if [ ! -f "${SHIM}" ] || [ ! -f "${GRUB_SIGNED}" ]; then
-    echo "[$SCRIPT_NAME] ERROR: shim-signed, grub-efi-amd64-signed がインストールされていません"
+    echo "[$SCRIPT_NAME] ERROR: shim-signed, grub-efi-amd64-signed are not installed"
     exit 1
 fi
 
 # BOOTX64.EFI = shim
 cp "${SHIM}" "${EFI_DIR}/BOOTX64.EFI"
 
-# grubx64.efi = 署名済み grub
+# grubx64.efi = signed grub
 cp "${GRUB_SIGNED}" "${EFI_DIR}/grubx64.efi"
 
-# grub.cfg を EFI 配下にもコピー（shim が探す場合に備え）
+# Copy grub.cfg to the EFI location as well (in case shim looks for it)
 install -m 0644 -D "${GRUB_CFG}" "${EFI_DIR}/grub.cfg"
 
-echo "[$SCRIPT_NAME] Secure Boot 対応 shim + grubx64.efi を配置しました"
+echo "[$SCRIPT_NAME] Placed Secure Boot compatible shim + grubx64.efi"
 
-# --- 2) efiboot.img を作成し、上記を内包 ---
+# --- 2) Create efiboot.img and embed the files above ---
 ESP_IMG="${EFI_DIR}/efiboot.img"
 rm -f "${ESP_IMG}"
+# Create a 10MB file for the FAT filesystem image
 dd if=/dev/zero of="${ESP_IMG}" bs=1M count=10
+# Create a FAT filesystem on the image
 mkfs.vfat -n EFI "${ESP_IMG}"
 
-# mtoolsでツリーを作成してコピー
+# Create directory tree and copy files using mtools
 mmd   -i "${ESP_IMG}" ::/EFI ::/EFI/BOOT
 mcopy -i "${ESP_IMG}" "${EFI_DIR}/BOOTX64.EFI" ::/EFI/BOOT/BOOTX64.EFI
 mcopy -i "${ESP_IMG}" "${EFI_DIR}/grubx64.efi" ::/EFI/BOOT/grubx64.efi
 mcopy -i "${ESP_IMG}" "${EFI_DIR}/grub.cfg"   ::/EFI/BOOT/grub.cfg
 
-echo "[$SCRIPT_NAME] efiboot.img を作成しました: ${ESP_IMG}"
+echo "[$SCRIPT_NAME] Created efiboot.img: ${ESP_IMG}"

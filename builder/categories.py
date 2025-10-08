@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-categories.json を読み込み、以下を提供するユーティリティ:
+Utility for loading categories.json and providing the following:
 
 - nodes:
-    includes / deps を再帰解決し、patterns を scripts_dir 上で
-    「実在ファイル名」へ glob 展開して収集する。
+    Recursively resolves 'includes' / 'deps' and collects 'real file names'
+    by glob-expanding 'patterns' on the scripts_dir.
 - prelude:
-    always_first をそのまま提供（正規化のみ）。
+    Provides 'always_first' as is (with normalization only).
 - finalizers:
-    always / on_failure / on_success をそのまま提供（正規化のみ）。
+    Provides 'always' / 'on_failure' / 'on_success' as is (with normalization only).
 
-※ 実行オーケストレーション（番号順の実行、成功/失敗での分岐、
-   chroot 判定など）は cl_main.py / executor.py 側で行います。
+* Note: Execution orchestration (sequential execution, branching on success/failure,
+   chroot detection, etc.) is handled by cl_main.py / executor.py.
 """
 
 from __future__ import annotations
@@ -51,9 +51,9 @@ class Categories:
     @classmethod
     def load(cls, path: Path) -> "Categories":
         """
-        categories.json を読み込む。
-        - // line コメント、/* block */ コメントを除去
-        - 末尾カンマも許容（軽量 JSON5 風）
+        Loads categories.json.
+        - Removes // line comments and /* block */ comments.
+        - Allows trailing commas (lightweight JSON5 style).
         """
         raw = path.read_text(encoding="utf-8")
         # block comments
@@ -75,9 +75,10 @@ class Categories:
         allow_deprecated_nodes: Set[str] | None = None,
     ) -> List[str]:
         """
-        トークン（ノード名 or ファイルパターン）を展開し、実在ファイル名の昇順リストを返す。
-        - ノード名: includes/deps を再帰解決し、patterns を scripts_dir 上で glob 展開して収集
-        - パターン: scripts_dir.glob() で直接マッチ
+        Expands tokens (node names or file patterns) and returns a sorted list of real file names.
+        - Node name: Recursively resolves includes/deps and collects real file names by glob-expanding
+          patterns on the scripts_dir.
+        - Pattern: Directly matches files using scripts_dir.glob().
         """
         if allow_deprecated_nodes is None:
             allow_deprecated_nodes = set()
@@ -98,7 +99,7 @@ class Categories:
                     allow_deprecated_nodes=allow_deprecated_nodes,
                 )
             else:
-                # ファイルパターンとして扱う
+                # Treat as a file pattern
                 for f in scripts_dir.glob(token):
                     if f.is_file():
                         results.add(f.name)
@@ -106,11 +107,11 @@ class Categories:
         return sorted(results)
 
     def get_prelude_always_first(self) -> List[str]:
-        """prelude.always_first（正規化済みの生データ）を返す。"""
+        """Returns prelude.always_first (normalized raw data)."""
         return list(self._prelude_always_first)
 
     def get_finalizers(self) -> Dict[str, List[str]]:
-        """finalizers（正規化済みの生データ）を返す。"""
+        """Returns finalizers (normalized raw data)."""
         return {
             "always": list(self._finalizers.get("always", [])),
             "on_failure": list(self._finalizers.get("on_failure", [])),
@@ -128,9 +129,9 @@ class Categories:
         allow_deprecated: bool,
         allow_deprecated_nodes: Set[str],
     ) -> None:
-        """ノード name を展開して results に実在ファイル名を追加する。"""
+        """Expands node 'name' and adds real file names to 'results'."""
         if name in seen:
-            # 循環参照は静かに無視（必要なら例外に変更可）
+            # Silently ignore circular dependencies (can be changed to raise an exception if needed)
             return
         seen.add(name)
 
@@ -138,19 +139,19 @@ class Categories:
         if not node:
             return
 
-        # deprecated 判定
+        # Deprecated check
         if node.get("deprecated", False):
             if not (allow_deprecated or name in allow_deprecated_nodes):
                 raise RuntimeError(f"Deprecated node '{name}' was included but not allowed")
 
-        # 自ノードの patterns を scripts_dir 上で glob 展開して収集
+        # Glob-expand and collect 'patterns' of the current node on scripts_dir
         for pat in node.get("patterns", []) or []:
             if isinstance(pat, str) and pat.strip():
                 for f in scripts_dir.glob(pat.strip()):
                     if f.is_file():
                         results.add(f.name)
 
-        # includes を再帰
+        # Recurse on 'includes'
         for child in node.get("includes", []) or []:
             if isinstance(child, str) and child.strip():
                 self._expand_node(
@@ -162,7 +163,7 @@ class Categories:
                     allow_deprecated_nodes=allow_deprecated_nodes,
                 )
 
-        # deps を再帰
+        # Recurse on 'deps'
         for dep in node.get("deps", []) or []:
             if isinstance(dep, str) and dep.strip():
                 self._expand_node(

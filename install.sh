@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 # -----------------------------------------------------------------------------
-# Livermorium GUI 一括インストーラー
-# 対応: Ubuntu / Debian / Arch / openSUSE / Fedora
+# Livermorium GUI Batch Installer
+# Supported: Ubuntu / Debian / Arch / openSUSE / Fedora
 #
-# すること:
-#   1) 依存導入（PyGObject / GTK4 / libadwaita / GtkSourceView / polkit 等）
-#      ※ polkit は GUI から cl_main.py を root で呼ぶ際（pkexec）に利用
-#   2) 起動ラッパー作成 (/usr/local/bin/<APP_CLI_NAME>) ※ pkexec は使わず main.py をユーザー権限で実行
-#   3) .desktop 登録 (/usr/local/share/applications/<APP_ID>.desktop)
-#   4) アイコンを hicolor に一括コピー（PNG 各サイズ + scalable の SVG）
-#   5) デスクトップDB / アイコンキャッシュ更新
+# Actions:
+#   1) Install dependencies (PyGObject / GTK4 / libadwaita / GtkSourceView / polkit, etc.)
+#      * polkit is used when calling cl_main.py from the GUI as root (via pkexec)
+#   2) Create startup wrapper (/usr/local/bin/<APP_CLI_NAME>) * Executes main.py with user privileges, no pkexec
+#   3) Register .desktop file (/usr/local/share/applications/<APP_ID>.desktop)
+#   4) Batch copy icons to hicolor (PNG in various sizes + scalable SVG)
+#   5) Update desktop DB / icon cache
 #
-# 前提:
-#   - このスクリプトと main.py は同じディレクトリ（= リポジトリ直下）
-#   - アイコンは ./assets/icons/ に hicolor 構成で用意
-#     例) assets/icons/16x16/apps/<APP_ID>.png
-#         assets/icons/32x32/apps/<APP_ID>.png
-#         ...
-#         assets/icons/scalable/apps/<APP_ID>.svg
+# Prerequisites:
+#   - This script and main.py are in the same directory (= repository root)
+#   - Icons are provided in ./assets/icons/ with hicolor structure
+#     E.g.) assets/icons/16x16/apps/<APP_ID>.png
+#           assets/icons/32x32/apps/<APP_ID>.png
+#           ...
+#           assets/icons/scalable/apps/<APP_ID>.svg
 # -----------------------------------------------------------------------------
 
 # ==========================
-# 1) 既定値
+# 1) Default Values
 # ==========================
 APP_ID="dev.livermorium.gui"
 APP_NAME="Livermorium"
@@ -34,24 +34,24 @@ CATEGORIES="System;Utility;"
 TERMINAL="false"
 
 # ==========================
-# 2) スクリプト位置から自動解決
+# 2) Automatic Resolution from Script Location
 # ==========================
 SCRIPT_PATH="$(readlink -f "$0")"
 SCRIPT_DIR="$(dirname "${SCRIPT_PATH}")"
-APP_MAIN="${SCRIPT_DIR}/main.py"      # ラッパーが起動する GUI 本体
+APP_MAIN="${SCRIPT_DIR}/main.py"      # The main GUI file launched by the wrapper
 ASSET_ROOT="${SCRIPT_DIR}/assets"
-ICON_SRC_DIR="${ASSET_ROOT}/icons"    # この配下を hicolor にそのままコピー（PNG+SVG）
+ICON_SRC_DIR="${ASSET_ROOT}/icons"    # This content is copied directly to hicolor (PNG+SVG)
 
 # ==========================
-# 3) インストール先
+# 3) Installation Destinations
 # ==========================
 BIN_DIR="${PREFIX}/bin"
 SHARE_DIR="${PREFIX}/share"
 DESKTOP_DIR="${SHARE_DIR}/applications"
-ICON_DIR="${SHARE_DIR}/icons/hicolor"  # hicolor のみ（pixmaps は使用しない）
+ICON_DIR="${SHARE_DIR}/icons/hicolor"  # Only hicolor (pixmaps is not used)
 
 # ==========================
-# 4) ユーティリティ
+# 4) Utilities
 # ==========================
 log()  { printf "\033[1;36m[INFO]\033[0m %s\n" "$*"; }
 warn() { printf "\033[1;33m[WARN]\033[0m %s\n" "$*"; }
@@ -61,13 +61,13 @@ exists(){ command -v "$1" >/dev/null 2>&1; }
 
 need_root() {
   if [ "${EUID:-$(id -u)}" -ne 0 ]; then
-    die "root 権限が必要です。sudo で実行してください。"
+    die "Root privileges are required. Please run with sudo."
   fi
 }
 
 read_os() {
   if [ ! -f /etc/os-release ]; then
-    die "/etc/os-release が見つかりません。"
+    die "/etc/os-release not found."
   fi
   # shellcheck disable=SC1091
   . /etc/os-release
@@ -77,17 +77,17 @@ read_os() {
 }
 
 # ==========================
-# 5) 依存パッケージ（ディストロ別）
+# 5) Dependencies (Per Distribution)
 # ==========================
 DEPS_UBUNTU=(
    python3 python3-gi
-  # GObject Introspection の GI バインディング
+  # GObject Introspection GI bindings
   gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5
-  # ランタイムライブラリ（gtk4 / libadwaita / gtksourceview5）
+  # Runtime libraries (gtk4 / libadwaita / gtksourceview5)
   libgtk-4-1 libadwaita-1-0 libgtksourceview-5-0
-  # ユーティリティ
+  # Utilities
   libglib2.0-bin desktop-file-utils
-  # pkexec（GUI→cl_main.py をroot起動する用途）
+  # pkexec (for running cl_main.py as root from the GUI)
   policykit-1
 )
 DEPS_DEBIAN=(
@@ -127,63 +127,63 @@ DEPS_OPENSUSE=(
 )
 
 # ==========================
-# 6) 依存導入
+# 6) Install Dependencies
 # ==========================
 install_deps_ubuntu() {
-  if ! exists apt; then die "apt が見つかりません（Ubuntu）。"; fi
-  log "apt update を実行します..."
+  if ! exists apt; then die "apt not found (Ubuntu)."; fi
+  log "Running apt update..."
   apt update
-  log "Ubuntu の依存パッケージをインストールします..."
+  log "Installing Ubuntu dependencies..."
   apt install -y "${DEPS_UBUNTU[@]}"
 }
 install_deps_debian() {
-  if ! exists apt; then die "apt が見つかりません（Debian）。"; fi
-  log "apt update を実行します..."
+  if ! exists apt; then die "apt not found (Debian)."; fi
+  log "Running apt update..."
   apt update
-  log "Debian の依存パッケージを確認しつつインストールします..."
+  log "Checking for and installing Debian dependencies..."
   local pkgs=()
   for pkg in "${DEPS_DEBIAN[@]}"; do
     if apt-cache show "$pkg" >/dev/null 2>&1; then
       pkgs+=("$pkg")
     else
-      warn "スキップ: $pkg"
+      warn "Skipping: $pkg"
     fi
   done
   if [ "${#pkgs[@]}" -gt 0 ]; then
     apt install -y "${pkgs[@]}"
   else
-    warn "インストール対象がありませんでした。"
+    warn "No packages found for installation."
   fi
 }
 install_deps_arch() {
-  if ! exists pacman; then die "pacman が見つかりません（Arch）。"; fi
-  log "pacman -Sy を実行します..."
+  if ! exists pacman; then die "pacman not found (Arch)."; fi
+  log "Running pacman -Sy..."
   pacman -Sy
-  log "Arch の依存パッケージをインストールします..."
+  log "Installing Arch dependencies..."
   pacman -S --needed --noconfirm "${DEPS_ARCH[@]}"
 }
 install_deps_fedora() {
-  if ! exists dnf; then die "dnf が見つかりません（Fedora）。"; fi
-  log "dnf makecache を実行します..."
+  if ! exists dnf; then die "dnf not found (Fedora)."; fi
+  log "Running dnf makecache..."
   dnf makecache -y
-  log "Fedora の依存パッケージをインストールします..."
+  log "Installing Fedora dependencies..."
   dnf install -y "${DEPS_FEDORA[@]}"
 }
 install_deps_opensuse() {
-  if ! exists zypper; then die "zypper が見つかりません（openSUSE）。"; fi
-  log "zypper refresh を実行します..."
+  if ! exists zypper; then die "zypper not found (openSUSE)."; fi
+  log "Running zypper refresh..."
   zypper --non-interactive refresh
-  log "openSUSE の依存パッケージをインストールします..."
+  log "Installing openSUSE dependencies..."
   for pkg in "${DEPS_OPENSUSE[@]}"; do
     if zypper --non-interactive install "$pkg"; then
       :
     else
-      warn "見つからない/失敗: $pkg（続行）"
+      warn "Not found/Failed: $pkg (Continuing)"
     fi
   done
 }
 install_deps() {
-  log "依存導入を開始します..."
+  log "Starting dependency installation..."
   case "${OS_ID}" in
     ubuntu)   install_deps_ubuntu   ;;
     debian)   install_deps_debian   ;;
@@ -192,32 +192,32 @@ install_deps() {
     opensuse*|suse|sles) install_deps_opensuse ;;
     *)
       if printf %s "${OS_ID_LIKE}" | grep -qi debian; then
-        warn "正式未対応: Debian系として試行します。"; install_deps_ubuntu || true
+        warn "Not officially supported: Trying as Debian-like. (Attempting to proceed)"; install_deps_ubuntu || true
       else
-        warn "未対応ディストロ。依存導入はスキップします。"
+        warn "Unsupported distribution. Skipping dependency installation."
       fi
       ;;
   esac
 }
 
 # ==========================
-# 7) ラッパー生成
+# 7) Generate Wrapper
 # ==========================
 wrapper_path() { echo "${BIN_DIR}/${APP_CLI_NAME}"; }
 
 install_wrapper() {
   if [ ! -f "${APP_MAIN}" ]; then
-    warn "main.py が見つかりません: ${APP_MAIN}（後で配置 → 再実行で更新）"
+    warn "main.py not found: ${APP_MAIN} (Place it later → re-run to update)"
   fi
 
-  log "起動ラッパーを生成します: $(wrapper_path)"
+  log "Generating startup wrapper: $(wrapper_path)"
   mkdir -p "${BIN_DIR}"
 
   cat >"$(wrapper_path)" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-# GUI 本体（repo 直下 main.py）をユーザー権限で起動
+# Launches the main GUI file (main.py in repo root) with user privileges
 PYTHON="${PYTHON:-python3}"
 APP_MAIN="__APP_MAIN__"
 
@@ -229,10 +229,10 @@ EOF
 }
 
 # ==========================
-# 8) .desktop 登録（Icon は拡張子なし）
+# 8) Register .desktop (Icon name is without extension)
 # ==========================
 install_desktop() {
-  log ".desktop を登録します: ${DESKTOP_DIR}/${APP_ID}.desktop"
+  log "Registering .desktop file: ${DESKTOP_DIR}/${APP_ID}.desktop"
   mkdir -p "${DESKTOP_DIR}"
   cat > "${DESKTOP_DIR}/${APP_ID}.desktop" <<EOF
 [Desktop Entry]
@@ -250,54 +250,54 @@ EOF
 }
 
 # ==========================
-# 9) アイコン配置（PNG+SVG を hicolor に丸ごとコピー）
+# 9) Place Icons (Copy PNG+SVG entirely to hicolor)
 # ==========================
 install_icons() {
   if [ ! -d "${ICON_SRC_DIR}" ]; then
-    warn "アイコンソースが見つかりません（${ICON_SRC_DIR}）。スキップします。"
+    warn "Icon source not found (${ICON_SRC_DIR}). Skipping."
     return 0
   fi
 
-  # 簡単 & 確実：用意した hicolor 構成をそのままコピー
-  log "hicolor へアイコンを一括コピーします: ${ICON_SRC_DIR} -> ${ICON_DIR}"
+  # Simple & reliable: copy the prepared hicolor structure as is
+  log "Batch copying icons to hicolor: ${ICON_SRC_DIR} -> ${ICON_DIR}"
   mkdir -p "${ICON_DIR}"
   cp -a "${ICON_SRC_DIR}/." "${ICON_DIR}/"
 }
 
 # ==========================
-# 10) キャッシュ更新
+# 10) Update Caches
 # ==========================
 update_caches() {
   if exists update-desktop-database; then
-    log "desktop-file データベース更新（update-desktop-database）..."
+    log "Updating desktop file database (update-desktop-database)..."
     update-desktop-database "${SHARE_DIR}/applications" || true
   fi
   if exists gtk-update-icon-cache; then
-    log "アイコンキャッシュ更新（gtk-update-icon-cache）..."
+    log "Updating icon cache (gtk-update-icon-cache)..."
     gtk-update-icon-cache -q -t -f "${SHARE_DIR}/icons/hicolor" || true
   fi
 }
 
 # ==========================
-# 11) アンインストール（PNG+SVG を明示的に削除）
+# 11) Uninstall (Explicitly remove PNG + SVG)
 # ==========================
 uninstall_all() {
-  log "アンインストールを実行します..."
+  log "Running uninstallation..."
 
-  # .desktop とラッパー
+  # .desktop and wrapper
   rm -f "${DESKTOP_DIR}/${APP_ID}.desktop" || true
   rm -f "$(wrapper_path)" || true
 
-  # PNG と SVG（決め打ちで）
+  # PNG and SVG (explicitly by pattern)
   rm -f "${ICON_DIR}/*/apps/${APP_ID}.png" 2>/dev/null || true
   rm -f "${ICON_DIR}/scalable/apps/${APP_ID}.svg" 2>/dev/null || true
 
   update_caches
-  log "アンインストール完了。"
+  log "Uninstallation complete."
 }
 
 # ==========================
-# 12) メイン処理
+# 12) Main Process
 # ==========================
 main() {
   need_root
@@ -316,16 +316,16 @@ main() {
 
   cat <<EOF
 
-== セットアップ完了 ==
-起動コマンド : ${APP_CLI_NAME}
-.desktop     : ${DESKTOP_DIR}/${APP_ID}.desktop
-アイコン       : ${ICON_DIR}/...
+== Setup Complete ==
+Launch Command : ${APP_CLI_NAME}
+.desktop File  : ${DESKTOP_DIR}/${APP_ID}.desktop
+Icons          : ${ICON_DIR}/...
 
-※ ラッパーはユーザー権限で ${APP_MAIN} を起動します。
-※ GUI 内で root が必要な処理（cl_main.py 実行など）に pkexec（polkit）を使ってください。
-※ リポジトリの場所が変わったら、このスクリプトを同じ場所で再実行してください（上書き更新）。
+* The wrapper launches ${APP_MAIN} with user privileges.
+* Please use pkexec (polkit) for any root-requiring processes within the GUI (e.g., executing cl_main.py).
+* If the repository location changes, re-run this script in the same location to update (overwrite).
 
-アンインストール:
+To Uninstall:
   sudo $(basename "$0") --uninstall
 
 EOF

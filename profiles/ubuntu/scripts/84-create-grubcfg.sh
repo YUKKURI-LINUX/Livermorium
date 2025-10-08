@@ -7,8 +7,10 @@ ISO_DIR="${WORK_DIR}/iso/${BASENAME}"
 GRUB_DIR="${ISO_DIR}/boot/grub"
 EFI_DIR="${ISO_DIR}/EFI/BOOT"
 
+# Create necessary directories
 mkdir -p "${GRUB_DIR}" "${EFI_DIR}"
 
+# Write grub.cfg file
 cat > "${GRUB_DIR}/grub.cfg" <<'EOF'
 insmod part_gpt
 insmod part_msdos
@@ -20,9 +22,9 @@ set default=0
 set timeout=5
 set timeout_style=menu
 
-# ISO 上の casper を確実に掴む
+# Reliably find casper on the ISO
 search --no-floppy --set=root --file /casper/vmlinuz
-# fallback: squashfs を探す
+# fallback: search for squashfs
 search --no-floppy --set=root --file /casper/filesystem.squashfs
 
 menuentry "Start Live (GNOME, casper)" {
@@ -36,7 +38,7 @@ menuentry "Start Live (Text mode, debug)" {
 }
 EOF
 
-# Secure Boot shim が直接読む場合に備え EFI 側にもコピー
+# Copy to the EFI side in case the Secure Boot shim reads it directly
 install -m 0644 -D "${GRUB_DIR}/grub.cfg" "${EFI_DIR}/grub.cfg"
 
-echo "[$SCRIPT_NAME] grub.cfg を作成: ${GRUB_DIR}/grub.cfg, ${EFI_DIR}/grub.cfg"
+echo "[$SCRIPT_NAME] Created grub.cfg: ${GRUB_DIR}/grub.cfg, ${EFI_DIR}/grub.cfg"
