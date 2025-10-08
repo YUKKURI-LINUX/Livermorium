@@ -3,48 +3,54 @@ set -e
 
 ISO_PATH="$1"
 
+# Check if an ISO file path is provided and if the file exists
 if [[ -z "$ISO_PATH" || ! -f "$ISO_PATH" ]]; then
-  echo "[ERROR] ISOファイルを指定してください"
-  echo "使い方: $0 path/to/image.iso"
+  echo "[ERROR] Please specify the ISO file path"
+  echo "Usage: $0 path/to/image.iso"
   exit 1
 fi
 
-echo "[INFO] ISOファイル: $ISO_PATH"
+echo "[INFO] ISO File: $ISO_PATH"
 
-# 1. El Torito（BIOS / UEFI ブート）チェック
+# 1. El Torito (BIOS / UEFI Boot) Check
 echo "---------------------------"
-echo "[CHECK] El Torito ブート情報"
+echo "[CHECK] El Torito Boot Information"
 echo "---------------------------"
-xorriso -indev "$ISO_PATH" -report_el_torito plain || echo "[ERROR] El Torito 情報の取得に失敗"
+# Report El Torito boot info; output an error message on failure
+xorriso -indev "$ISO_PATH" -report_el_torito plain || echo "[ERROR] Failed to retrieve El Torito information"
 
-# 2. ファイル構成の確認
+# 2. File Structure Check
 echo
 echo "---------------------------"
-echo "[CHECK] ISOファイル構成"
+echo "[CHECK] ISO File Structure"
 echo "---------------------------"
 TMPDIR=$(mktemp -d)
 mountpoint="$TMPDIR/mnt"
 mkdir -p "$mountpoint"
 
-echo "[INFO] ISOをマウントして確認: $mountpoint"
+echo "[INFO] Mounting ISO for verification: $mountpoint"
+# Mount the ISO using the loop device
 sudo mount -o loop "$ISO_PATH" "$mountpoint"
 
+# Function to check for file existence
 check_file() {
   if [[ -f "$mountpoint/$1" ]]; then
     echo "[OK]   $1"
   else
-    echo "[NG]   $1 が存在しません"
+    echo "[NG]   $1 does not exist"
   fi
 }
 
+# Function to check for directory existence (currently unused in original script, but kept for completeness if needed)
 check_dir() {
   if [[ -d "$mountpoint/$1" ]]; then
     echo "[OK]   $1/"
   else
-    echo "[NG]   $1/ が存在しません"
+    echo "[NG]   $1/ does not exist"
   fi
 }
 
+# Check for essential boot and filesystem files
 check_file "boot/grub/i386-pc/eltorito.img"
 check_file "boot/grub/grub.cfg"
 check_file "EFI/boot/bootx64.efi"
@@ -56,9 +62,10 @@ check_file "casper/filesystem.squashfs"
 check_file "casper/filesystem.size"
 
 echo
-echo "[INFO] マウント解除します"
+echo "[INFO] Unmounting ISO"
+# Unmount the ISO and remove the temporary directory
 sudo umount "$mountpoint"
 rm -rf "$TMPDIR"
 
 echo
-echo "[DONE] ISOチェック完了"
+echo "[DONE] ISO check complete"

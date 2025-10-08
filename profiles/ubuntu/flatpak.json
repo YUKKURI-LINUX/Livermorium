@@ -1,11 +1,11 @@
 [
-  { "name": "org.mozilla.firefox", "description": "ウェブブラウザ（Firefox）", "default": true },
-  { "name": "org.gnome.Calculator", "description": "GNOME電卓", "default": true },
-  { "name": "org.gnome.TextEditor", "description": "GNOMEテキストエディタ（gedit代替）", "default": true },
-  { "name": "org.gnome.Extensions", "description": "GNOME Shell 拡張機能の管理", "default": true },
+  { "name": "org.mozilla.firefox", "description": "Web Browser (Firefox)", "default": true },
+  { "name": "org.gnome.Calculator", "description": "GNOME Calculator", "default": true },
+  { "name": "org.gnome.TextEditor", "description": "GNOME Text Editor (gedit replacement)", "default": true },
+  { "name": "org.gnome.Extensions", "description": "GNOME Shell Extensions management", "default": true },
 
-  { "name": "org.gnome.Nautilus", "description": "ファイルマネージャ（Flatpak版、APT版の代替用）", "default": false },
-  { "name": "org.gnome.Epiphany", "description": "GNOME Web（軽量ブラウザ）", "default": false },
-  { "name": "org.gnome.FileRoller", "description": "ファイルアーカイブ（圧縮・解凍）", "default": false },
-  { "name": "org.libreoffice.LibreOffice", "description": "オフィススイート（LibreOffice）", "default": true }
+  { "name": "org.gnome.Nautilus", "description": "File Manager (Flatpak version, for APT version replacement)", "default": false },
+  { "name": "org.gnome.Epiphany", "description": "GNOME Web (Lightweight browser)", "default": false },
+  { "name": "org.gnome.FileRoller", "description": "File Archiver (Compression/Decompression)", "default": false },
+  { "name": "org.libreoffice.LibreOffice", "description": "Office Suite (LibreOffice)", "default": true }
 ]

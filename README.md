@@ -1,114 +1,121 @@
-# Livermorium
-GUI、CLIで実行可能なカスタムディストリビュージョン作成システムです。
-各ディストリビュージョン対応を目標にしてますが、現時点では
-Ubuntuベースのみの対応です。
-# 実行方法
-## 1.環境構築
-```
+# Livermorium System Description (English Translation)
+
+Japanese
+[README_ja.md](README_ja.md)
+
+## Livermorium
+
+Livermorium is a **custom distribution creation system** executable via both **GUI and CLI**. We aim to support various distribution bases, but currently, it **only supports Ubuntu-based systems**.
+
+## Execution Instructions
+
+### 1\. Environment Setup
+
+```bash
 ./install.py
 ```
-## 2.GUI実行
-ICONが追加されているのでそのまま実行可能です
-## 3.CLI実行
-下で記載の使い方を参照して下さい。
 
-## !CLI実行時注意事項!
-ペッケージのインストール時に
-gdmかLightDMのどちらをデフォルトにするか聞いてきます。
-2　を入力して先に進んで下さい。
-（LightDMを指示）
+### 2\. GUI Execution
+
+The application can be launched directly as an **ICON** has been added to your environment.
+
+### 3\. CLI Execution
+
+Refer to the usage section described below for command-line instructions.
 
 
+## Implemented Specifications
 
-# 実装できている仕様
+This system is a **build environment that generates custom ISOs** for various distribution bases.
 
-各ディストリベースのカスタムISOを生成するビルド環境です。  
-実行順序は **番号ルール（00〜99）昇順**、`prelude`（先頭必須）→ **本編** → `finalizers`（終了必須）で構成します。  
-GUI からの呼び出しも想定し、**カテゴリ/グループ定義**と**実行制御**を分離しています。
+The execution order strictly follows a **numerical rule (00 to 99) in ascending order**: `prelude` (always run first) → **main content** → `finalizers` (always run last).
 
-- 実行計画（論理）: `profiles/<profile>/categories.json`
-  - `nodes`（カテゴリ/グループ）、`prelude`、`finalizers` を定義
-- 実行方式（物理）: `profiles/<profile>/execution.json`
-  - chroot 実行帯 `min`/`max` のみを定義（既定 50..79）
+To support GUI execution, we separate the execution plan into **Category/Group Definitions** and **Execution Control**.
 
+  * **Execution Plan (Logical):** `profiles/<profile>/categories.json`
+      * Defines `nodes` (categories/groups), `prelude`, and `finalizers`.
+  * **Execution Method (Physical):** `profiles/<profile>/execution.json`
+      * Only defines the chroot execution range (`min`/`max`) (default is 50..79).
 
-## 1. 主要ディレクトリ
+-----
+
+## 1\. Key Directories
 
 ```
 Livermorium/
-├─ cl_main.py                # 実行オーケストレーション入口
+├─ cl_main.py                # Command-Line Orchestration Entry Point
 ├─ builder/
-│  ├─ executor.py            # prelude→本編→finalizers を番号昇順で実行（chroot帯考慮）
-│  ├─ categories.py          # categories.json の読み込み/正規化/ノード解決
-│  ├─ logger.py              # 逐次ログ書き出し
-│  ├─ config_loader.py       # config, package/flatpak list ロード
-│  └─ …（既存）
+│  ├─ executor.py            # Executes prelude→main→finalizers in numerical order (respecting chroot range)
+│  ├─ categories.py          # Loading/Normalization/Node Resolution for categories.json
+│  ├─ logger.py              # Sequential Log Writer
+│  ├─ config_loader.py       # Config, package/flatpak list Loader
+│  └─ … (existing)
 ├─ profiles/
 │  └─ ubuntu/
-│     ├─ scripts/            # 実スクリプト（00〜99）
-│     │  ├─ 実行スクリプトを番号を付与して準備しておく
-│     ├─ categories.json     # 実行論理（prelude/finalizers含む）
-│     └─ execution.json      # chroot 実行帯（min/max のみ）
-└─ work_build/               # 実行時に生成（logs, scripts, <basename>/tmp 等）
+│     ├─ scripts/            # Actual Scripts (00 to 99)
+│     │  ├─ Scripts to be executed should be prepared with numerical prefixes
+│     ├─ categories.json     # Execution Logic (including prelude/finalizers)
+│     └─ execution.json      # Chroot Execution Range (min/max only)
+└─ work_build/               # Generated during execution (logs, scripts, <basename>/tmp, etc.)
 ```
 
----
+-----
 
-## 2. categories.json（定義例）
+## 2\. `categories.json` (Example Definition)
 
 ```json
 {
   "nodes": {
     "base": {
-      "desc": "初期準備",
+      "desc": "Initial preparation",
       "patterns": ["05-*.sh", "10-*.sh", "30-*.sh", "40-*.sh"]
     },
     "locale": {
-      "desc": "ロケール/キーボード",
+      "desc": "Locale / Keyboard settings",
       "deps": ["base"],
       "patterns": ["50-locale.sh", "52-keyboard.sh"]
     },
     "user": {
-      "desc": "ユーザー・グループ",
+      "desc": "User and Group setup",
       "deps": ["locale"],
       "patterns": ["60-user.sh"]
     },
     "packages": {
-      "desc": "APT/Flatpak 導入",
+      "desc": "APT/Flatpak installation",
       "deps": ["user"],
       "patterns": ["65-packages.sh"]
     },
     "desktop": {
-      "desc": "デスクトップ設定/Calamares/サービス",
+      "desc": "Desktop settings / Calamares / Services",
       "deps": ["packages"],
       "patterns": ["70-dconf-settings.sh", "71-calamares-install.sh", "75-enable-services.sh", "76-systemd-initramfs.sh"]
     },
     "finalize": {
-      "desc": "rootfs コピー後/整備",
+      "desc": "Post-rootfs copy / Cleanup",
       "deps": ["desktop"],
       "patterns": ["80-copy-rootfs-after.sh", "81-chown-home.sh", "82-purge-hostside.sh"]
     },
     "boot": {
-      "desc": "GRUB と EFI/El Torito",
+      "desc": "GRUB and EFI/El Torito generation",
       "deps": ["finalize"],
       "patterns": ["84-create-grubcfg.sh", "85-generate-eltorito.sh", "86-generate-efi.sh"]
     },
     "iso": {
-      "desc": "ISO 最終生成",
+      "desc": "Final ISO generation",
       "deps": ["boot"],
       "patterns": ["90-build-iso.sh"]
     },
 
     "minimal": {
-      "desc": "最小構成（基本 + ロケール）",
+      "desc": "Minimal setup (base + locale)",
       "includes": ["base", "locale"]
     },
     "with-packages": {
-      "desc": "パッケージ導入まで",
+      "desc": "Up to package installation",
       "includes": ["minimal", "user", "packages"]
     },
     "full-desktop": {
-      "desc": "フル構成（ISOまで）",
+      "desc": "Full configuration (up to ISO)",
       "includes": ["with-packages", "desktop", "finalize", "boot", "iso"]
     }
   },
@@ -125,9 +132,9 @@ Livermorium/
 }
 ```
 
----
+-----
 
-## 3. execution.json（定義例）
+## 3\. `execution.json` (Example Definition)
 
 ```json
 {
@@ -138,58 +145,59 @@ Livermorium/
 }
 ```
 
----
+-----
 
-## 4. 使い方
+## 4\. Usage Examples
 
-### 4.1 計画確認
+### 4.1 Plan Check
+
 ```bash
 sudo ./cl_main.py ubuntu --print-plan --dry-run
 ```
 
-### 4.2 フル構成
+### 4.2 Full Configuration
+
 ```bash
 sudo ./cl_main.py ubuntu -r full-desktop
 ```
 
-### 4.3 パッケージ導入まで
+### 4.3 Up to Package Installation
+
 ```bash
 sudo ./cl_main.py ubuntu -r with-packages
 ```
 
-### 4.4 ブート処理だけ（パターン指定）
+### 4.4 Only Boot Processing (Pattern Specification)
+
 ```bash
 sudo ./cl_main.py ubuntu -r "85-*.sh"
 ```
 
----
+-----
 
-## 5. コマンドラインオプション一覧
+## 5\. Command-Line Options List
 
-| オプション | 意味 | 例 |
+| Option | Meaning | Example |
 |---|---|---|
-| `profile` | プロファイル名（必須） | `ubuntu` |
-| `-r, --run` | ノード名/パターン（カンマ区切り） | `full-desktop,85-*.sh` |
-| `--allow-deprecated` | deprecated ノードを依存から許可（全体） |  |
-| `--allow-deprecated-nodes` | 特定ノードだけ許可（CSV） | `old-desktop,legacy` |
-| `--chroot-min` | chroot 最小番号 | `60` |
-| `--chroot-max` | chroot 最大番号 | `89` |
-| `--print-plan` | 実行計画を表示 |  |
-| `--validate` | 計画検証のみで終了 |  |
-| `--list-only` | 実行対象一覧のみで終了 |  |
-| `--dry-run` | 実行せずコマンドのみログ出力 |  |
-| `--continue-on-error` | エラーでも続行 |  |
-| `--package-list` | 追加APTパッケージ（CSV） | `vim,htop` |
-| `--flatpak-list` | 追加Flatpak（CSV） | `org.mozilla.firefox,org.gimp.GIMP` |
+| `profile` | Profile name (required) | `ubuntu` |
+| `-r, --run` | Node name/pattern (comma-separated) | `full-desktop,85-*.sh` |
+| `--allow-deprecated` | Allow deprecated nodes from dependencies (globally) | |
+| `--allow-deprecated-nodes` | Allow only specific nodes (CSV) | `old-desktop,legacy` |
+| `--chroot-min` | Chroot minimum script number | `60` |
+| `--chroot-max` | Chroot maximum script number | `89` |
+| `--print-plan` | Display the execution plan | |
+| `--validate` | Exit after only validating the plan | |
+| `--list-only` | Exit after only listing execution targets | |
+| `--dry-run` | Log commands without execution | |
+| `--continue-on-error`| Continue execution even on error | |
+| `--package-list` | Additional APT packages (CSV) | `vim,htop` |
+| `--flatpak-list` | Additional Flatpak applications (CSV) | `org.mozilla.firefox,org.gimp.GIMP` |
 
----
+-----
 
-## 6. 実行ルール
+## 6\. Execution Rules
 
-- 番号昇順が絶対ルール
-- prelude は常に先頭、finalizers は常に最後
-- finalizers.on_failure は失敗時のみ、on_success は成功時のみ
-- すべての複数指定はカンマ区切り統一
-
----
-
+  * **Ascending numerical order** is the absolute rule.
+  * `prelude` is always at the start, and `finalizers` are always at the end.
+  * `finalizers.on_failure` runs only upon failure; `finalizers.on_success` runs only upon success.
+  * All multiple specifications must be **comma-separated**.

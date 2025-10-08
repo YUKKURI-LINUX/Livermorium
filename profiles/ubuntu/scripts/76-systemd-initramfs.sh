@@ -1,35 +1,40 @@
 #!/bin/bash
 set -e
 SCRIPT_NAME="$(basename "$0")"
-echo "[${SCRIPT_NAME}] initrd.img を再生成します..."
+echo "[${SCRIPT_NAME}] Regenerating initrd.img..."
 
+# Get the latest installed kernel version
 KERNEL_VERSION=$(ls /lib/modules | sort -V | tail -n 1)
-echo "使用カーネルバージョン: $KERNEL_VERSION"
+echo "Using kernel version: $KERNEL_VERSION"
 
+# Check if the kernel image exists and reinstall if missing
 if [ ! -f "/boot/vmlinuz-$KERNEL_VERSION" ]; then
-  echo "vmlinuz が存在しません。再インストールを行います..."
+  echo "vmlinuz does not exist. Reinstalling..."
+  # Reinstall the kernel image package
   apt install --reinstall "linux-image-$KERNEL_VERSION"
 fi
 
 
-# initramfs.conf の INIT を systemd に設定（既存の INIT= を置換または追記）
+# Set INIT=init in initramfs.conf (replaces existing INIT= or appends)
+# Note: The original script's comment says "Set INIT to systemd", but the command writes "INIT=init". 
+# The command is kept as "echo 'INIT=init' >> /etc/initramfs-tools/initramfs.conf" to preserve the execution logic.
     echo 'INIT=init' >> /etc/initramfs-tools/initramfs.conf
 
-# /etc/hostname（systemd の初期化に必要）
+# /etc/hostname (required for systemd initialization)
 echo "livermorium" > /etc/hostname
 
-# machine-id の初期化
+# Initialize machine-id
 systemd-machine-id-setup
 
-# initrd.img を再生成
+# Regenerate initrd.img
 update-initramfs -c -k "$KERNEL_VERSION"
 
-# /init が生成されたか確認（警告として表示）
+# Verify if /init was generated (show as a warning if not)
 if lsinitramfs "/boot/initrd.img-$KERNEL_VERSION" | grep -q '^init$'; then
-    echo "✓ /init が含まれています"
+    echo "✓ /init is included"
 else
-    echo "⚠ /init が含まれていません！（カーネルパニックの原因になる可能性あり）"
+    echo "⚠ /init is NOT included! (Potential cause of kernel panic)"
     exit 1
 fi
 
-echo "[${SCRIPT_NAME}] 完了"
+echo "[${SCRIPT_NAME}] Complete"

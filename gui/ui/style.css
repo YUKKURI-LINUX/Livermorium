@@ -1,11 +1,11 @@
-/* 全体を白ベースに（混在対策） */
+/* Sets the entire UI to a white base (to prevent color mixing issues) */
 window, .background, box, stack, stackswitcher,
 scrolledwindow, viewport, list, row {
   background-color: #ffffff;
   color: #111111;
 }
 
-/* StackSwitcher の余白を詰める（横幅が広がりすぎないよう） */
+/* Reduces padding/spacing for StackSwitcher buttons (to prevent excessive width) */
 stackswitcher > button {
   padding-left: 6px;
   padding-right: 6px;
@@ -16,13 +16,13 @@ stackswitcher > button > label {
 }
 
 
-/* 最低サイズ（補助。実効はUIの min-content-* を優先） */
+/* Minimum size (auxiliary. UI's min-content-* properties take precedence for effective size) */
 #root {
   min-width: 840px;
   min-height: 620px;
 }
 
-/* スクロール領域の主張を控えめに（幅を縮めやすく） */
+/* Reduces the prominence of the scroll area (to allow for easier horizontal shrinking) */
 .scroller {
   min-width: 320px;
   min-height: 320px;

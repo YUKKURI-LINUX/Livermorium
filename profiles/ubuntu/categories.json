@@ -1,55 +1,55 @@
 {
   "nodes": {
     "base": {
-      "desc": "初期準備",
+      "desc": "Initial Preparation",
       "patterns": ["05-*.sh", "10-*.sh", "30-*.sh", "40-*.sh"]
     },
     "locale": {
-      "desc": "ロケール/キーボード",
+      "desc": "Locale/Keyboard",
       "deps": ["base"],
       "patterns": ["50-locale.sh", "52-keyboard.sh"]
     },
     "user": {
-      "desc": "ユーザー・グループ",
+      "desc": "User and Groups",
       "deps": ["locale"],
       "patterns": ["60-user.sh"]
     },
     "packages": {
-      "desc": "APT/Flatpak 導入",
+      "desc": "APT/Flatpak Installation",
       "deps": ["user"],
       "patterns": ["65-packages.sh"]
     },
     "desktop": {
-      "desc": "デスクトップ設定/Calamares/サービス",
+      "desc": "Desktop Settings/Calamares/Services",
       "deps": ["packages"],
       "patterns": ["70-dconf-settings.sh", "71-calamares-install.sh", "75-enable-services.sh", "76-systemd-initramfs.sh"]
     },
     "finalize": {
-      "desc": "rootfs コピー後/整備",
+      "desc": "Post-rootfs Copy/Cleanup",
       "deps": ["desktop"],
       "patterns": ["80-copy-rootfs-after.sh", "81-chown-home.sh", "82-purge-hostside.sh"]
     },
     "boot": {
-      "desc": "GRUB と EFI/El Torito",
+      "desc": "GRUB and EFI/El Torito",
       "deps": ["finalize"],
       "patterns": ["84-create-grubcfg.sh", "85-generate-eltorito.sh", "86-generate-efi.sh"]
     },
     "iso": {
-      "desc": "ISO 最終生成",
+      "desc": "Final ISO Generation",
       "deps": ["boot"],
       "patterns": ["90-build-iso.sh"]
     },
 
     "minimal": {
-      "desc": "最小構成（基本 + ロケール）",
+      "desc": "Minimal Configuration (Base + Locale)",
       "includes": ["base", "locale"]
     },
     "with-packages": {
-      "desc": "パッケージ導入まで",
+      "desc": "Up to Package Installation",
       "includes": ["minimal", "user", "packages"]
     },
     "full-desktop": {
-      "desc": "フル構成（ISOまで）",
+      "desc": "Full Configuration (up to ISO)",
       "includes": ["with-packages", "desktop", "finalize", "boot", "iso"]
     }
   },

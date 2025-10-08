@@ -2,37 +2,37 @@
 
 set -e
 
-# ユーザー名とパスワード、グループを読み込む
+# Read username, password, and groups
 USERNAME="${USERNAME:-livermorium}"
 PASSWORD="${PASSWORD:-livermorium}"
 USER_GROUPS="${USER_GROUPS:-wheel}"
 
-echo "[INFO] ユーザー '$USERNAME' を作成中..."
-echo "[INFO] グループ: $USER_GROUPS"
+echo "[INFO] Creating user '$USERNAME'..."
+echo "[INFO] Groups: $USER_GROUPS"
 
-# グループが存在しなければ作成
+# Create groups if they don't exist
 IFS="," read -r -a __GRPS <<< "$USER_GROUPS"
 for group in "${__GRPS[@]}"; do
     if ! getent group "$group" > /dev/null 2>&1; then
-        echo "[INFO] グループ '$group' を作成"
+        echo "[INFO] Creating group '$group'"
         groupadd "$group"
     fi
 done
 
-# ユーザーが既に存在するか確認
+# Check if the user already exists
 if id "$USERNAME" &>/dev/null; then
-    echo "[WARN] ユーザー '$USERNAME' は既に存在します"
+    echo "[WARN] User '$USERNAME' already exists"
 else
-    # ユーザーを作成
+    # Create the user
     useradd -m -s /bin/bash "$USERNAME"
     echo "$USERNAME:$PASSWORD" | chpasswd
-    echo "[INFO] ユーザー '$USERNAME' を作成しました"
+    echo "[INFO] User '$USERNAME' created"
 fi
 
-# グループにユーザーを追加
+# Add the user to the groups
 IFS="," read -r -a __GRPS <<< "$USER_GROUPS"
 for group in "${__GRPS[@]}"; do
     usermod -aG "$group" "$USERNAME"
 done
 
-echo "[INFO] '$USERNAME' をグループ '$USER_GROUPS' に追加しました"
+echo "[INFO] Added '$USERNAME' to groups '$USER_GROUPS'"
