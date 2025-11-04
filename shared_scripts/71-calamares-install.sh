@@ -6,7 +6,7 @@ source /tmp/env.sh
 SCRIPT_NAME="$(basename "$0")"
 echo "[$SCRIPT_NAME] Installing Calamares..."
 
-# Check /etc/os-release for distribution ID
+# Check /etc/os-release for getting distribution ID
 if [ -f /etc/os-release ]; then
     source /etc/os-release
 fi
@@ -22,8 +22,8 @@ elif [[ "$ID" == "fedora" || "$ID_LIKE" == *"fedora"* ]]; then
 elif [[ "$ID" == "opensuse-tumbleweed" || "$ID_LIKE" == *"suse"* ]]; then
     zypper install -y calamares
 else
-    echo "[$SCRIPT_NAME] Distribution not supported for Calamares installation"
+    echo "[$SCRIPT_NAME] This distribution is not supported."
     exit 1
 fi
 
-echo "[$SCRIPT_NAME] Calamares installation complete"
+echo "[$SCRIPT_NAME] Installed Calamares successfully"

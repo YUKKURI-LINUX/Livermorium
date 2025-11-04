@@ -8,13 +8,13 @@ PASSWORD="${PASSWORD:-livermorium}"
 USER_GROUPS="${USER_GROUPS:-wheel}"
 
 echo "[INFO] Creating user '$USERNAME'..."
-echo "[INFO] Groups: $USER_GROUPS"
+echo "[INFO] Setting new user's groups...: $USER_GROUPS"
 
 # Create groups if they don't exist
 IFS="," read -r -a __GRPS <<< "$USER_GROUPS"
 for group in "${__GRPS[@]}"; do
     if ! getent group "$group" > /dev/null 2>&1; then
-        echo "[INFO] Creating group '$group'"
+        echo "[INFO] Creating unexisting group: '$group'"
         groupadd "$group"
     fi
 done

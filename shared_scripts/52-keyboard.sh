@@ -4,7 +4,7 @@ set -e
 source /tmp/env.sh
 
 SCRIPT_NAME="$(basename "$0")"
-echo "[$SCRIPT_NAME] Starting keyboard configuration setup..."
+echo "[$SCRIPT_NAME] Setting up the keyboard..."
 
 # Generate /etc/default/keyboard
 cat >/etc/default/keyboard <<EOF
@@ -28,4 +28,4 @@ EOF
 DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive keyboard-configuration || true
 
 
-echo "[$SCRIPT_NAME] Keyboard configuration setup complete"
+echo "[$SCRIPT_NAME] Keyboard configuration is set up successfully."

@@ -1,63 +1,60 @@
-# Livermorium システム概要（日本語訳）
+English ver: [README.md](./README.md)
 
-## Livermorium（リバーモリウム）
+# Livermorium
 
-Livermorium は、**GUI および CLI の両方から実行可能なカスタムディストリビューション作成システム**です。様々なディストリビューションベースのサポートを目指していますが、**現在のところは Ubuntu ベースのシステムのみに対応**しています。
+Livermorium はカスタムされたLinuxディストリビューションを作成するツールです。様々なディストリビューションのサポートを目指していますが、現在は**Ubuntu ベースのシステムのみに対応**しています。
 
 ## 実行方法
 
-### 1\. 環境セットアップ
+### 1. インストール
 
 ```bash
 ./install.py
 ```
 
-### 2\. GUI 実行
+実行後、アプリケーションメニューにエントリが追加されます。
 
-アプリケーションは、環境に **アイコンが追加されているため**、直接起動できます。
+CLI版については、後述の「利用例」セクションを参照してください。
 
-### 3\. CLI 実行
+## 仕様
 
-コマンドラインでの使用法については、後述の「利用例」セクションを参照してください。
+本システムは、様々なLinuxディストリビューションをベースとしたカスタム ISO を生成するためのビルドツールです。
 
-## 実装仕様
+スクリプトは以下の順に、通し番号の若いものから実行されます。:
+`prelude` (常に最初に実行)→ メインコンテンツ → `finalizers` (常に最後に実行)
 
-本システムは、様々なディストリビューションベースの**カスタム ISO を生成するためのビルド環境**です。
+GUI版の実行順は以下のファイルにより定義されます。
 
-実行順序は、`prelude`（常に最初に実行）→ **メインコンテンツ** → `finalizers`（常に最後に実行）という\*\*昇順の数値ルール（00〜99）\*\*に厳密に従います。
-
-GUI 実行をサポートするため、実行計画を**カテゴリ/グループ定義**と**実行制御**に分けています。
-
-  * **実行計画（論理）**：`profiles/<profile>/categories.json`
-      * `nodes`（カテゴリ/グループ）、`prelude`、`finalizers` を定義します。
-  * **実行方法（物理）**：`profiles/<profile>/execution.json`
-      * chroot 実行範囲（`min`/`max`）のみを定義します（デフォルトは 50〜79）。
+  * `profiles/<profile>/categories.json`
+      * `nodes` (カテゴリ/グループ)、`prelude`、`finalizers` を定義します。
+  * `profiles/<profile>/execution.json`
+      * 現状、chrootで実行されるスクリプトの範囲 (`min`/`max`)のみを定義します (デフォルトは 50〜79)。
 
 -----
 
-## 1\. 主要ディレクトリ
+## ディレクトリ構造
 
 ```
 Livermorium/
-├─ cl_main.py                # コマンドラインによるオーケストレーションのエントリーポイント
+├─ cl_main.py                # CLI版 (実行可能)
 ├─ builder/
-│  ├─ executor.py            # prelude→メイン→finalizers を数値順に実行（chroot 範囲を考慮）
-│  ├─ categories.py          # categories.json の読み込み/正規化/ノード解決
-│  ├─ logger.py              # シーケンシャルなログ書き込み
-│  ├─ config_loader.py       # 設定、パッケージ/Flatpak リストの読み込み
-│  └─ …（既存ファイル）
+│  ├─ executor.py            # スクリプト実行処理の定義
+│  ├─ categories.py          # categories.jsonのロード処理の定義
+│  ├─ logger.py              # ロガー定義
+│  ├─ config_loader.py       # 設定、パッケージ/Flatpak リストの読み込みの定義
+│  └─ … (etc.)
 ├─ profiles/
 │  └─ ubuntu/
-│     ├─ scripts/            # 実際のスクリプト群（00〜99）
-│     │  ├─ 実行するスクリプトは数値プレフィックスを付けて準備する必要があります
-│     ├─ categories.json     # 実行ロジック（prelude/finalizers を含む）
-│     └─ execution.json      # chroot 実行範囲（min/max のみ）
-└─ work_build/               # 実行中に生成される作業ディレクトリ（ログ、スクリプト、<basename>/tmp など）
+│     ├─ scripts/            # スクリプトの実体 (00〜99)
+│     │  ├─ (executorにより実行されるスクリプトは、すべて名前の先頭に連番が振られている必要があります。)
+│     ├─ categories.json     # カテゴリ定義ファイル (prelude/finalizers を含む)
+│     └─ execution.json      # 実行設定定義ファイル (min/max のみ)
+└─ work_build/               # 作業ディレクトリ (ログ、スクリプト、<basename>/tmp など) (実行時に生成)
 ```
 
 -----
 
-## 2\. `categories.json`（定義例）
+## `categories.json` (定義例)
 
 ```json
 {
@@ -103,7 +100,7 @@ Livermorium/
     },
 
     "minimal": {
-      "desc": "最小限のセットアップ（base + locale）",
+      "desc": "最小限のセットアップ (base + locale)",
       "includes": ["base", "locale"]
     },
     "with-packages": {
@@ -111,7 +108,7 @@ Livermorium/
       "includes": ["minimal", "user", "packages"]
     },
     "full-desktop": {
-      "desc": "完全な構成（ISO まで）",
+      "desc": "完全な構成 (ISO まで)",
       "includes": ["with-packages", "desktop", "finalize", "boot", "iso"]
     }
   },
@@ -130,7 +127,7 @@ Livermorium/
 
 -----
 
-## 3\. `execution.json`（定義例）
+## 3. `execution.json` (定義例)
 
 ```json
 {
@@ -143,27 +140,27 @@ Livermorium/
 
 -----
 
-## 4\. 利用例
+## 4. 利用例 (CLI版)
 
-### 4.1 計画の確認
+### 4.1 プランの確認
 
 ```bash
 sudo ./cl_main.py ubuntu --print-plan --dry-run
 ```
 
-### 4.2 完全な構成の実行
+### 4.2 実行 (フル)
 
 ```bash
 sudo ./cl_main.py ubuntu -r full-desktop
 ```
 
-### 4.3 パッケージインストールまでの実行
+### 4.3 実行 (パッケージインストール)
 
 ```bash
 sudo ./cl_main.py ubuntu -r with-packages
 ```
 
-### 4.4 ブート処理のみの実行（パターン指定）
+### 4.4 パターン実行 (ブートローダー関連)
 
 ```bash
 sudo ./cl_main.py ubuntu -r "85-*.sh"
@@ -171,29 +168,29 @@ sudo ./cl_main.py ubuntu -r "85-*.sh"
 
 -----
 
-## 5\. コマンドラインオプション一覧
+## 5. コマンドラインオプション
 
 | オプション | 意味 | 例 |
 |---|---|---|
-| `profile` | プロファイル名（必須） | `ubuntu` |
-| `-r, --run` | ノード名/パターン（カンマ区切り） | `full-desktop,85-*.sh` |
-| `--allow-deprecated` | 非推奨ノードからの依存関係を許可（グローバル） | |
-| `--allow-deprecated-nodes` | 特定のノードのみを許可（カンマ区切り） | `old-desktop,legacy` |
+| `profile` | プロファイル名 (必須) | `ubuntu` |
+| `-r, --run` | ノード名/パターン (カンマ区切り) | `full-desktop,85-*.sh` |
+| `--allow-deprecated` | 非推奨ノードからの依存関係を許可 (グローバル) | `(no additional options)` |
+| `--allow-deprecated-nodes` | 特定のノードのみを許可 (カンマ区切り) | `old-desktop,legacy` |
 | `--chroot-min` | chroot 内の最小スクリプト番号 | `60` |
 | `--chroot-max` | chroot 内の最大スクリプト番号 | `89` |
-| `--print-plan` | 実行計画を表示 | |
-| `--validate` | 計画の検証のみを行い終了 | |
-| `--list-only` | 実行対象をリスト表示して終了 | |
-| `--dry-run` | コマンドをログに記録するだけで実行しない | |
-| `--continue-on-error`| エラーが発生しても実行を続行する | |
-| `--package-list` | 追加の APT パッケージ（カンマ区切り） | `vim,htop` |
-| `--flatpak-list` | 追加の Flatpak アプリケーション（カンマ区切り） | `org.mozilla.firefox,org.gimp.GIMP` |
+| `--print-plan` | プランを表示 |　`(no additional options)` |
+| `--validate` | プランの検証のみを行い終了 | `(no additional options)` |
+| `--list-only` | ターゲットリストの表示 | `(no additional options)` |
+| `--dry-run` | 一切の変更を加えず実行 | `(no additional options)` |
+| `--continue-on-error`| エラーが発生しても実行を続行する | `(no additional options)` |
+| `--package-list` | 追加の APT パッケージ (カンマ区切り) | `vim,htop` |
+| `--flatpak-list` | 追加の Flatpak アプリケーション (カンマ区切り) | `org.mozilla.firefox,org.gimp.GIMP` |
 
 -----
 
-## 6\. 実行ルール
+## 6. 実行ルールについて
 
-  * **昇順の数値順**が絶対的なルールです。
-  * `prelude` は常に開始時、`finalizers` は常に終了時に実行されます。
+  * **昇順の数値順** (00, 01, 02, ...)に実行されます。
+  * `prelude` は常に処理開始時、`finalizers` は常に処理終了時に実行されます。
   * `finalizers.on_failure` は失敗時のみ、`finalizers.on_success` は成功時のみ実行されます。
-  * 複数の指定はすべて**カンマ区切り**で行う必要があります。
+  * 複数パターンの指定はすべて**カンマ区切り**で行う必要があります。

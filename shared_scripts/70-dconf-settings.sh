@@ -4,9 +4,9 @@ set -e
 source /tmp/env.sh
 
 SCRIPT_NAME="$(basename "$0")"
-echo "[$SCRIPT_NAME] Applying GNOME dconf settings..."
+echo "[$SCRIPT_NAME] Setting up dconf default values..."
 
-# /etc/dconf/profile/user is required
+# The file /etc/dconf/profile/user is required
 echo "user-db:user\nsystem-db:local" > /etc/dconf/profile/user
 
 # Skip if config file doesn't exist
@@ -20,8 +20,8 @@ if  [ -f  /etc/dconf/db/local.d/* ]; then
         dconf update
     fi
 
-    echo "[$SCRIPT_NAME] dconf setup complete"
+    echo "[$SCRIPT_NAME] Finished dconf settings successfully"
     
 else
-    echo "[$SCRIPT_NAME] dconf setup skipped"
+    echo "[$SCRIPT_NAME] Skipped dconf settings"
 fi
