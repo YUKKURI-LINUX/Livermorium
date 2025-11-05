@@ -4,10 +4,10 @@ set -e
 SCRIPT_NAME="$(basename "$0")"
 CHROOT_DIR="${WORK_DIR}/$BASENAME"  
 
-echo "[$SCRIPT_NAME] Starting unnecessary file cleanup from outside chroot (Target: $CHROOT_DIR)"
+echo "[$SCRIPT_NAME] Cleaning up unnecessary files out of the chroot directory... (Target: $CHROOT_DIR)"
 
 # ----------------------------------------
-# Delete APT related cache and lists
+# Delete APT cache and package lists
 # ----------------------------------------
 rm -rf "$CHROOT_DIR/var/cache/apt/archives"/*
 rm -rf "$CHROOT_DIR/var/lib/apt/lists"/*
@@ -21,7 +21,7 @@ rm -rf "$CHROOT_DIR/var/tmp"/*
 # ----------------------------------------
 # Delete Flatpak cache (excluding fontconfig)
 # ----------------------------------------
-# Cleanup for regular users' Flatpak cache
+# Clean up regular users' Flatpak cache
 for user_dir in "$CHROOT_DIR/home/"*; do
     app_cache_base="$user_dir/.var/app"
     if [[ -d "$app_cache_base" ]]; then
@@ -36,7 +36,7 @@ for user_dir in "$CHROOT_DIR/home/"*; do
     fi
 done
 
-# Cleanup for root user's Flatpak cache
+# Clean up root user's Flatpak cache
 if [[ -d "$CHROOT_DIR/root/.var/app" ]]; then
     for app_dir in "$CHROOT_DIR/root/.var/app"/*; do
         cache_dir="$app_dir/cache"
@@ -62,4 +62,4 @@ rm -rf "$CHROOT_DIR/var/log"/*
 mkdir -p "$CHROOT_DIR/var/log"
 touch "$CHROOT_DIR/var/log/dpkg.log"
 
-echo "[$SCRIPT_NAME] Host-side cleanup complete"
+echo "[$SCRIPT_NAME] Unnecessary files in the host has been deleted successfully"

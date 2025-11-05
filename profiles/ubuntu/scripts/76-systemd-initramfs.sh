@@ -9,7 +9,7 @@ echo "Using kernel version: $KERNEL_VERSION"
 
 # Check if the kernel image exists and reinstall if missing
 if [ ! -f "/boot/vmlinuz-$KERNEL_VERSION" ]; then
-  echo "vmlinuz does not exist. Reinstalling..."
+  echo "Couldn't find vmlinuz. Reinstalling..."
   # Reinstall the kernel image package
   apt install --reinstall "linux-image-$KERNEL_VERSION"
 fi
@@ -20,7 +20,7 @@ fi
 # The command is kept as "echo 'INIT=init' >> /etc/initramfs-tools/initramfs.conf" to preserve the execution logic.
     echo 'INIT=init' >> /etc/initramfs-tools/initramfs.conf
 
-# /etc/hostname (required for systemd initialization)
+# Set up /etc/hostname (required for systemd initialization)
 echo "livermorium" > /etc/hostname
 
 # Initialize machine-id
@@ -31,9 +31,9 @@ update-initramfs -c -k "$KERNEL_VERSION"
 
 # Verify if /init was generated (show as a warning if not)
 if lsinitramfs "/boot/initrd.img-$KERNEL_VERSION" | grep -q '^init$'; then
-    echo "✓ /init is included"
+    echo "/init is included"
 else
-    echo "⚠ /init is NOT included! (Potential cause of kernel panic)"
+    echo "/init is NOT included! (Potential cause of kernel panic)"
     exit 1
 fi
 

@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_NAME="$(basename "$0")"
-echo "[$SCRIPT_NAME] Starting chroot environment unmount and cleanup..."
+echo "[$SCRIPT_NAME] Cleaning up the chroot directory..."
 
 # Set BASENAME with a default value
 BASENAME="${BASENAME:=hogehoge-ubuntu}"
@@ -27,4 +27,4 @@ for mp in "${MOUNT_POINTS[@]}"; do
   fi
 done
 
-echo "[$SCRIPT_NAME] chroot environment cleanup complete"
+echo "[$SCRIPT_NAME] The chroot directory has been cleaned up successfully."

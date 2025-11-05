@@ -1,67 +1,55 @@
-# Livermorium System Description (English Translation)
+Japanese version: [README_ja.md](README_ja.md)
 
-Japanese
-[README_ja.md](README_ja.md)
+# Livermorium
 
-## Livermorium
+Livermorium is the custom Linux distribution creation system. We're planning to support various distribution bases (e.g. Debian, Fedora, Arch), but currently, it **only supports Ubuntu-based systems**.
 
-Livermorium is a **custom distribution creation system** executable via both **GUI and CLI**. We aim to support various distribution bases, but currently, it **only supports Ubuntu-based systems**.
-
-## Execution Instructions
-
-### 1\. Environment Setup
+## Installation (for GUI)
 
 ```bash
 ./install.py
 ```
 
-### 2\. GUI Execution
+After executing this script, you can launch Livermorium from the application menu.
 
-The application can be launched directly as an **ICON** has been added to your environment.
+## Specifications
 
-### 3\. CLI Execution
+This system is designed for create customized Linux distributions based on various basis.
 
-Refer to the usage section described below for command-line instructions.
+The script execution order strictly follows this order below, and a **numerical rule (00 to 99) in ascending order**: `prelude` (always run first) → **main content** → `finalizers` (always run last).
 
+To control scripts execution order in the GUI, these configurations are defined. :
 
-## Implemented Specifications
-
-This system is a **build environment that generates custom ISOs** for various distribution bases.
-
-The execution order strictly follows a **numerical rule (00 to 99) in ascending order**: `prelude` (always run first) → **main content** → `finalizers` (always run last).
-
-To support GUI execution, we separate the execution plan into **Category/Group Definitions** and **Execution Control**.
-
-  * **Execution Plan (Logical):** `profiles/<profile>/categories.json`
+  * `profiles/<profile>/categories.json`
       * Defines `nodes` (categories/groups), `prelude`, and `finalizers`.
-  * **Execution Method (Physical):** `profiles/<profile>/execution.json`
-      * Only defines the chroot execution range (`min`/`max`) (default is 50..79).
+  * `profiles/<profile>/execution.json`
+      * Only defines the script execution range running in the chroot directory (`min`/`max`) (default is 50..79) now.
 
 -----
 
-## 1\. Key Directories
+## Directory Structures
 
 ```
-Livermorium/
-├─ cl_main.py                # Command-Line Orchestration Entry Point
+Livermorium (project root)/
+├─ cl_main.py                # Executable script for the CLI version
 ├─ builder/
-│  ├─ executor.py            # Executes prelude→main→finalizers in numerical order (respecting chroot range)
-│  ├─ categories.py          # Loading/Normalization/Node Resolution for categories.json
-│  ├─ logger.py              # Sequential Log Writer
-│  ├─ config_loader.py       # Config, package/flatpak list Loader
-│  └─ … (existing)
+│  ├─ executor.py 
+│  ├─ categories.py          
+│  ├─ logger.py
+│  ├─ config_loader.py
+│  └─ (etc.)
 ├─ profiles/
 │  └─ ubuntu/
-│     ├─ scripts/            # Actual Scripts (00 to 99)
-│     │  ├─ Scripts to be executed should be prepared with numerical prefixes
-│     ├─ categories.json     # Execution Logic (including prelude/finalizers)
-│     └─ execution.json      # Chroot Execution Range (min/max only)
-└─ work_build/               # Generated during execution (logs, scripts, <basename>/tmp, etc.)
+│     ├─ scripts/            # Real scripts (numbered from 00 to 99)
+│     │  ├─ (Scripts are executed following numbers ascendingly, so you have to name these script with numbers in the right order.)
+│     ├─ categories.json
+│     └─ execution.json
+└─ work_build/               # Working directory that created automatically in the process. It contains logs, temporary copied scripts, temporary directories, etc.
 ```
 
 -----
 
-## 2\. `categories.json` (Example Definition)
+## Example of `categories.json`
 
 ```json
 {
@@ -134,7 +122,7 @@ Livermorium/
 
 -----
 
-## 3\. `execution.json` (Example Definition)
+## Example of `execution.json`
 
 ```json
 {
@@ -147,27 +135,27 @@ Livermorium/
 
 -----
 
-## 4\. Usage Examples
+## Usage Examples
 
-### 4.1 Plan Check
+### 1. Check Plans
 
 ```bash
 sudo ./cl_main.py ubuntu --print-plan --dry-run
 ```
 
-### 4.2 Full Configuration
+### 2. Run (Full)
 
 ```bash
 sudo ./cl_main.py ubuntu -r full-desktop
 ```
 
-### 4.3 Up to Package Installation
+### 3. Run (Package Installation)
 
 ```bash
 sudo ./cl_main.py ubuntu -r with-packages
 ```
 
-### 4.4 Only Boot Processing (Pattern Specification)
+### 4. Run with the Pattern Specifications (Bootloader Configuration)
 
 ```bash
 sudo ./cl_main.py ubuntu -r "85-*.sh"
@@ -175,29 +163,29 @@ sudo ./cl_main.py ubuntu -r "85-*.sh"
 
 -----
 
-## 5\. Command-Line Options List
+## Command-Line Options
 
 | Option | Meaning | Example |
 |---|---|---|
 | `profile` | Profile name (required) | `ubuntu` |
 | `-r, --run` | Node name/pattern (comma-separated) | `full-desktop,85-*.sh` |
-| `--allow-deprecated` | Allow deprecated nodes from dependencies (globally) | |
+| `--allow-deprecated` | Allow deprecated nodes from dependencies (globally) | `(no additional options)` |
 | `--allow-deprecated-nodes` | Allow only specific nodes (CSV) | `old-desktop,legacy` |
 | `--chroot-min` | Chroot minimum script number | `60` |
 | `--chroot-max` | Chroot maximum script number | `89` |
-| `--print-plan` | Display the execution plan | |
-| `--validate` | Exit after only validating the plan | |
-| `--list-only` | Exit after only listing execution targets | |
-| `--dry-run` | Log commands without execution | |
-| `--continue-on-error`| Continue execution even on error | |
+| `--print-plan` | Display the execution plan | `(no additional options)` |
+| `--validate` | Exit after only validating the plan | `(no additional options)` |
+| `--list-only` | Exit after only listing execution targets | `(no additional options)` |
+| `--dry-run` | Log commands without execution | `(no additional options)` |
+| `--continue-on-error`| Continue execution even on error | `(no additional options)` |
 | `--package-list` | Additional APT packages (CSV) | `vim,htop` |
 | `--flatpak-list` | Additional Flatpak applications (CSV) | `org.mozilla.firefox,org.gimp.GIMP` |
 
 -----
 
-## 6\. Execution Rules
+## Script Execution Rules
 
-  * **Ascending numerical order** is the absolute rule.
-  * `prelude` is always at the start, and `finalizers` are always at the end.
-  * `finalizers.on_failure` runs only upon failure; `finalizers.on_success` runs only upon success.
-  * All multiple specifications must be **comma-separated**.
+  * All scripts are executed sequentially in ascending order by number.
+  * `prelude` is always executed in the initial process, and `finalizers` are always executed in the final.
+  * `finalizers.on_failure` only runs upon failure; `finalizers.on_success` only runs upon success.
+  * All multiple pattern specifications must be **comma-separated**.

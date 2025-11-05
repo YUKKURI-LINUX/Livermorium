@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_NAME="$(basename "$0")"
-echo "[$SCRIPT_NAME] Starting chroot environment preparation (mounting, etc.)..."
+echo "[$SCRIPT_NAME] Preparing the chroot directory..."
 
 BASENAME="${BASENAME}"
 CHROOT_DIR="${WORK_DIR}/$BASENAME"
@@ -16,4 +16,4 @@ for fs in proc sys dev dev/pts; do
     mount --bind "/$fs" "$CHROOT_DIR/$fs"
 done
 
-echo "[$SCRIPT_NAME] chroot environment mounting complete"
+echo "[$SCRIPT_NAME] the chroot environment is ready."

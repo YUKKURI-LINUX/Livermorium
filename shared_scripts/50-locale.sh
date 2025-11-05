@@ -4,7 +4,7 @@ set -e
 source /tmp/env.sh
 
 SCRIPT_NAME="$(basename "$0")"
-echo "[$SCRIPT_NAME] Starting locale and timezone setup..."
+echo "[$SCRIPT_NAME] Setting up locale and timezone..."
 
 
 # Remove extraneous whitespace (to prevent "Bad entry" issues)
@@ -39,4 +39,4 @@ EOF
 ln -sf "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime
 echo "$TIMEZONE" > /etc/timezone
 
-echo "[$SCRIPT_NAME] Locale and timezone setup complete"
+echo "[$SCRIPT_NAME] Locale and timezone are set up successfully."

@@ -7,10 +7,10 @@ ISO_DIR="${WORK_DIR}/iso/${BASENAME}"
 GRUB_DIR="${ISO_DIR}/boot/grub"
 EFI_DIR="${ISO_DIR}/EFI/BOOT"
 
-# Create necessary directories
+# Create mandatory directories
 mkdir -p "${GRUB_DIR}" "${EFI_DIR}"
 
-# Write grub.cfg file
+# Create grub.cfg
 cat > "${GRUB_DIR}/grub.cfg" <<'EOF'
 insmod part_gpt
 insmod part_msdos
@@ -38,7 +38,7 @@ menuentry "Start Live (Text mode, debug)" {
 }
 EOF
 
-# Copy to the EFI side in case the Secure Boot shim reads it directly
+# Copy grub.cfg to the EFI directory (shim-signed requires this directory structure)
 install -m 0644 -D "${GRUB_DIR}/grub.cfg" "${EFI_DIR}/grub.cfg"
 
 echo "[$SCRIPT_NAME] Created grub.cfg: ${GRUB_DIR}/grub.cfg, ${EFI_DIR}/grub.cfg"
