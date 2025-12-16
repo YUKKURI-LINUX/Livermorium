@@ -17,12 +17,19 @@
   { "name": "gnome-keyring", "description": "Password storage service", "default": true },
   { "name": "adwaita-icon-theme-full", "description": "GNOME standard icons (full version)", "default": true },
 
-  { "name": "ubuntu-desktop", "description": "Complete Ubuntu desktop environment (GNOME)", "default": true },
+  { "name": "ubuntu-desktop", "description": "Complete Ubuntu desktop environment (GNOME)", "default": false },
+  { "name": "gnome-core", "description": "GNOME Desktop Environment -- essential components", "default": true },
+
+  { "name": "dconf-cli", "description": "dconf command line tool", "default": true },
+
 
   { "name": "lightdm", "description": "Lightweight display manager", "default": false },
   { "name": "lightdm-gtk-greeter", "description": "GTK-based LightDM login screen", "default": false },
 
   { "name": "network-manager", "description": "Network management", "default": true },
+  { "name": "network-manager-gnome", "description": "Network management GUI", "default": true },
+  { "name": "network-manager-config-connectivity-ubuntu", "description": "Network management ubuntu", "default": true },
+
   { "name": "policykit-1", "description": "Privilege escalation tool", "default": true },
   { "name": "udisks2", "description": "Disk mounting helper", "default": true },
   { "name": "gvfs-backends", "description": "Nautilus remote file access (SMB/FTP)", "default": true },
@@ -61,8 +68,8 @@
   { "name": "bluez-obexd", "description": "Bluetooth OBEX file transfer", "default": true },
   { "name": "gnome-bluetooth-3-common", "description": "GNOME Bluetooth integration", "default": true },
 
-  { "name": "alsa-utils", "description": "ALSA volume control utilities", "default": true },
-  { "name": "pulseaudio", "description": "PulseAudio sound server", "default": true },
+  { "name": "alsa-utils", "description": "ALSA volume control utilities", "default": false },
+  { "name": "pulseaudio", "description": "PulseAudio sound server", "default": false },
 
   { "name": "cups", "description": "Printing system", "default": true },
   { "name": "wget", "description": "File retrieval tool", "default": true },
