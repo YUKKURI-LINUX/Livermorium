@@ -7,7 +7,7 @@ echo "[$SCRIPT_NAME] Creating a new minimal installation of Ubuntu..."
 # Get variables (with default values).
 BASENAME="${BASENAME}"
 SUITE="${SUITE:-noble}"  # Default: Ubuntu 24.04 (Noble Numbat)
-MIRROR="${MIRROR:-http://ubuntutym.u-toyama.ac.jp/ubuntu}"
+MIRROR="${MIRROR:-http://ftp.riken.go.jp/Linux/ubuntu}"
 ARCH="${ARCH:-amd64}"
 
 TARGET_DIR="${WORK_DIR}/$BASENAME"
