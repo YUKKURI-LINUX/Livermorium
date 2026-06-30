@@ -26,18 +26,18 @@ echo "[$SCRIPT_NAME] Enabling required systemd services..."
 #fi
 
 # Network Manager services
-if systemctl list-unit-files | grep -q NetworkManager.service; then
-    echo "[$SCRIPT_NAME] Enabling NetworkManager..."
-    systemctl enable NetworkManager
-elif systemctl list-unit-files | grep -q wicked.service; then
-    echo "[$SCRIPT_NAME] Enabling wicked..."
-    systemctl enable wicked
-elif systemctl list-unit-files | grep -q systemd-networkd.service; then
-    echo "[$SCRIPT_NAME] Enabling systemd-networkd..."
-    systemctl enable systemd-networkd
-else
-    echo "[$SCRIPT_NAME] No supported network manager service is installed."
-fi
+#if systemctl list-unit-files | grep -q NetworkManager.service; then
+#    echo "[$SCRIPT_NAME] Enabling NetworkManager..."
+#    systemctl enable NetworkManager
+#elif systemctl list-unit-files | grep -q wicked.service; then
+#    echo "[$SCRIPT_NAME] Enabling wicked..."
+#    systemctl enable wicked
+#elif systemctl list-unit-files | grep -q systemd-networkd.service; then
+#    echo "[$SCRIPT_NAME] Enabling systemd-networkd..."
+#    systemctl enable systemd-networkd
+#else
+#    echo "[$SCRIPT_NAME] No supported network manager service is installed."
+#fi
 
 # Bluetooth service
 if systemctl list-unit-files | grep -q bluetooth.service; then

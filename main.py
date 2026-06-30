@@ -775,15 +775,20 @@ class MainWindow(Gtk.ApplicationWindow):
         self.proc.wait_check_async(None, self._on_wait_done, None)
 
     def _force_kill_if_alive(self):
-        if self.proc is None:
-            return False
-        try:
-            if not self.proc.get_if_exited() and not self.proc.get_if_signaled():
-                self._log("Attempting forced termination", "[INFO]")
-                self.proc.force_exit()
-        except Exception as e:
-            self._log(f"Forced termination failed: {e}", "[WARN]")
-        return False
+            import subprocess
+            try:
+                result=subprocess.run(["pgrep","-f","cl_main.py"],capture_output=True,text=True,check=True)
+                cl_main_pids = result.stdout.strip().split()
+
+                for pid in cl_main_pids:
+                    if pid:
+                        subprocess.run(["pkexec","pkill","-9","-P",pid],check=False)
+                        self._log(f"Forced kill: {pid}", "[INFO]")
+
+        #except subprosess.CalledProcess.errror
+            except: 
+                self._log(f"Forced termination failed: {pid}", "[WARN]")
+                return False
 
     def _on_wait_done(self, proc: Gio.Subprocess, res, _data=None):
         try:

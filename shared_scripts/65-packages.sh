@@ -10,8 +10,8 @@ source /etc/os-release
 echo "[INFO] Adding universe/multiverse repositories to sources.list"
 cat <<EOF > /etc/apt/sources.list
 
-deb http://ubuntutym.u-toyama.ac.jp/ubuntu $VERSION_CODENAME main restricted universe multiverse
-deb  http://ubuntutym.u-toyama.ac.jp/ubuntu $VERSION_CODENAME-updates main restricted universe multiverse
+deb http://ftp.riken.go.jp/Linux/ubuntu $VERSION_CODENAME main restricted universe multiverse
+deb http://ftp.riken.go.jp/Linux/ubuntu $VERSION_CODENAME-updates main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu $VERSION_CODENAME-security main restricted universe multiverse
 EOF
 
